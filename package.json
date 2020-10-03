@@ -1,0 +1,20 @@
+{
+  "name": "@rbansal16/stormy_build",
+  "version": "1.0.2",
+  "description": "CLI tool for Stormy Build",
+  "main": "./index.js",
+  "bin": {
+    "stormy": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Rahul Bansal",
+  "license": "ISC",
+  "dependencies": {
+    "keypair": "^1.0.1",
+    "node-forge": "^0.10.0"
+  },
+  "devDependencies": {}
+}
