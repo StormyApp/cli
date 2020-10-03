@@ -4,7 +4,6 @@ var keypair = require('keypair');
 const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
 var exec = require('child_process').exec;
-
 // 
 var forge = require('node-forge');
 var CONSTANTS = require('./const');
@@ -13,6 +12,10 @@ const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy
 
 function isSSHInitDone(){
   return fs.existsSync(CONSTANTS.SSH_PRIVATE_KEY_FILE);
+}
+
+async function syncTheBuildToLocal(){
+
 }
 
 async function initSSH(user) { 
@@ -81,7 +84,7 @@ function getExcludedFolderString(excludedFolders){
 }
 
 function getSSHCommandString(){
-  return '-e \"ssh -i ' + CONSTANTS.RSYNC.PATH_TO_KEY + '\"'
+  return '-e \"' + getExecutablePath() + '/DeltaCopy/' +'ssh -i ' + CONSTANTS.RSYNC.PATH_TO_KEY + '\"'
 }
 
 function getSourceFolder(){
@@ -93,30 +96,39 @@ function getCurrentFoder(){
   return  dir[dir.length - 1];
 }
 
-function getDestinationFolder(){
-  return CONSTANTS.RSYNC.DEST_FOLDER_USERNAME + '@' + CONSTANTS.RSYNC.IP  + ":~/" + getCurrentFoder()
-  // return CONSTANTS.RSYNC.DEST_FOLDER_USERNAME + '@' + CONSTANTS.RSYNC.IP  + ":~" 
+function pathToRemoteFolder(folderName){
+  return CONSTANTS.RSYNC.DEST_FOLDER_USERNAME + '@' + CONSTANTS.RSYNC.IP  + ":~/" + folderName 
 }
 
-function generateRsyncCommandString(){
-  return  CONSTANTS.RSYNC.NAME +
+function generateRsyncCommandString(sourceDir, destDir){
+  return getExecutablePath ()+  CONSTANTS.RSYNC.NAME +
    CONSTANTS.RSYNC.SPACE  +
   CONSTANTS.RSYNC.ARGS + CONSTANTS.RSYNC.SPACE  +
   getExcludedFolderString(CONSTANTS.RSYNC.EXCLUDED_FOLDERS) + CONSTANTS.RSYNC.SPACE  +
   getSSHCommandString() + CONSTANTS.RSYNC.SPACE +
-  getSourceFolder() + CONSTANTS.RSYNC.SPACE  +
-  getDestinationFolder() + CONSTANTS.RSYNC.SPACE
+  sourceDir + CONSTANTS.RSYNC.SPACE  +
+  destDir + CONSTANTS.RSYNC.SPACE
 }
+
+function getPackageLocation(){
+
+}
+
 
 function getCommandUtil(remoteCommand){
   return " \" mkdir "+ getCurrentFoder()+";cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\""
 }
 
 function getRemoteCommandString(remoteCommand){
-  return 'ssh -i ' + 
+  return './DeltaCopy/ssh -i ' + 
   CONSTANTS.RSYNC.PATH_TO_KEY + ' ' + 
   CONSTANTS.RSYNC.DEST_FOLDER_USERNAME + 
   '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
+}
+
+function getExecutablePath(){
+  // Tells the path of the package where package is instaleld
+  return __dirname
 }
 
 async function excuteCommand(command){
@@ -157,8 +169,13 @@ async function excuteCommand(command){
   // }
 }
 
-var str = generateRsyncCommandString()
+var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
+console.log(str)
 excuteCommand(str);
+
+var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
+console.log(syncBuildToLocal)
+excuteCommand(syncBuildToLocal)
 
 args = process.argv.slice(2)
 console.log(args);
