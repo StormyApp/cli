@@ -84,7 +84,7 @@ function getExcludedFolderString(excludedFolders){
 }
 
 function getSSHCommandString(){
-  return '-e \"' + getExecutablePath() + '/DeltaCopy/' +'ssh -i ' + CONSTANTS.RSYNC.PATH_TO_KEY + '\"'
+  return '-e \"' + getExecutablePath('ssh') + ' -i ' + CONSTANTS.RSYNC.PATH_TO_KEY + '\"'
 }
 
 function getSourceFolder(){
@@ -101,7 +101,7 @@ function pathToRemoteFolder(folderName){
 }
 
 function generateRsyncCommandString(sourceDir, destDir){
-  return getExecutablePath ()+  CONSTANTS.RSYNC.NAME +
+  return getExecutablePath (CONSTANTS.RSYNC.NAME) + 
    CONSTANTS.RSYNC.SPACE  +
   CONSTANTS.RSYNC.ARGS + CONSTANTS.RSYNC.SPACE  +
   getExcludedFolderString(CONSTANTS.RSYNC.EXCLUDED_FOLDERS) + CONSTANTS.RSYNC.SPACE  +
@@ -126,18 +126,19 @@ function getRemoteCommandString(remoteCommand){
   '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
 }
 
-function getExecutablePath(){
+function getExecutablePath(name){
   // Tells the path of the package where package is instaleld
-  return __dirname
+  switch(name){
+    case 'ssh':
+      return __dirname + '/DeltaCopy/ssh'
+    case 'rsync':
+      return __dirname + '/DeltaCopy/rsync'
+  }
 }
 
 async function excuteCommand(command){
   console.log(command)
   var executor = exec(command);
-  var writer  = fs.createWriteStream(null ,{ 
-    flags: 'w',
-    fd : 1
-  })
 
   executor.stdout.on('data', function(data){
     var p = data.replace('localhost', CONSTANTS.RSYNC.IP)
