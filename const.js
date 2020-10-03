@@ -12,11 +12,11 @@ const CONSTANTS = {
 }
 
 const RSYNC = {
-    NAME: 'rsync.exe',
+    NAME: 'rsync',
     ARGS: '-zvrlt',
     SPACE: ' ',
     PATH_TO_KEY: '~\\buildexp_pair.pem',
-    EXCLUDED_FOLDERS: ['.stormy', '.git'],
+    EXCLUDED_FOLDERS: ['.stormy', '.git', 'node_modules'],
     DEST_FOLDER_USERNAME: 'ubuntu',
     IP: '3.6.95.176'
 }

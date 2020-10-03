@@ -14,10 +14,6 @@ function isSSHInitDone(){
   return fs.existsSync(CONSTANTS.SSH_PRIVATE_KEY_FILE);
 }
 
-async function syncTheBuildToLocal(){
-
-}
-
 async function initSSH(user) { 
   if (isSSHInitDone()){
     return 
@@ -64,10 +60,6 @@ async function executeArgumentsOnRemote(args){
   console.log("Executing arguments on remote", args)
 }
 
-async function syncTheUserDir(){
-  setTimeout();
-}
-
 init();
 
 function getExcludedFolderString(excludedFolders){
@@ -108,10 +100,6 @@ function generateRsyncCommandString(sourceDir, destDir){
   getSSHCommandString() + CONSTANTS.RSYNC.SPACE +
   sourceDir + CONSTANTS.RSYNC.SPACE  +
   destDir + CONSTANTS.RSYNC.SPACE
-}
-
-function getPackageLocation(){
-
 }
 
 
