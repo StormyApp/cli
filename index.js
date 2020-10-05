@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 const fs = require("fs");
-var keypair = require('keypair');
 const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
 var exec = require('child_process').exec;
 // 
-var forge = require('node-forge');
 var CONSTANTS = require('./const');
 
 const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy/.ssh/id_rsa -C rabans"
@@ -18,18 +16,6 @@ async function initSSH(user) {
   if (isSSHInitDone()){
     return 
   }
-  console.log("Doing the init for SSH");
-  var pair = keypair();
-  var publicKey = forge.pki.publicKeyFromPem(pair.public);
-  var privateKey = forge.pki.privateKeyFromPem(pair.private)
-  var sshPublicKey = forge.ssh.publicKeyToOpenSSH(publicKey, );
-  var sshPrivateKey = forge.ssh.privateKeyToOpenSSH(privateKey,'');
-  console.log(sshPublicKey)
-  console.log(sshPrivateKey)
-  writeToFile(sshPublicKey, CONSTANTS.SSH_PUBLIC_KEY_FILE)
-  writeToFile(sshPrivateKey, CONSTANTS.SSH_PRIVATE_KEY_FILE)
-  writeToFile(sshPrivateKey, CONSTANTS.SSH_PRIVATE_KEY_FILE)
-  // return x
 }
 
 async function writeToFile(content, filePath){
