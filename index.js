@@ -102,6 +102,9 @@ function getRemoteCommandString(remoteCommand){
 
 function getExecutablePath(name){
   // Tells the path of the package where package is instaleld
+  if(process.platform == 'win32'){
+    return name;
+  }
   switch(name){
     case 'ssh':
       return __dirname + '/DeltaCopy/ssh'
