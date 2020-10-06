@@ -42,10 +42,6 @@ async function createDir(targetDir) {
   }
 }
 
-async function executeArgumentsOnRemote(args){
-  console.log("Executing arguments on remote", args)
-}
-
 init();
 
 function getExcludedFolderString(excludedFolders){
@@ -62,7 +58,7 @@ function getExcludedFolderString(excludedFolders){
 }
 
 function getSSHCommandString(){
-  return '-e \"' + getExecutablePath('ssh') + ' -i ' + CONSTANTS.RSYNC.PATH_TO_KEY + '\"'
+  return '-e \"' + getExecutablePath('ssh') + ' -i ' + getUserKey() + '\"'
 }
 
 function getSourceFolder(){
@@ -94,15 +90,13 @@ function getCommandUtil(remoteCommand){
 }
 
 function getRemoteCommandString(remoteCommand){
-  return './DeltaCopy/ssh -i ' + 
-  CONSTANTS.RSYNC.PATH_TO_KEY + ' ' + 
+  return getExecutablePath('ssh') +' -i ' + getUserKey()+ ' ' + 
   CONSTANTS.RSYNC.DEST_FOLDER_USERNAME + 
   '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
 }
 
 function getExecutablePath(name){
-  // Tells the path of the package where package is instaleld
-  if(process.platform == 'win32'){
+  if(process.platform != 'win32'){
     return name;
   }
   switch(name){
@@ -111,6 +105,12 @@ function getExecutablePath(name){
     case 'rsync':
       return __dirname + '/DeltaCopy/rsync'
   }
+}
+
+function getUserKey(uid){
+  const key =  __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
+  console.log("Trying to fetch the user key", key)
+  return key
 }
 
 async function excuteCommand(command){
@@ -123,7 +123,7 @@ async function excuteCommand(command){
   })
   
   executor.stderr.pipe(process.stderr);
-  executor.stdin.pipe(process.stdin)
+  executor.stdin.pipe(process.stdin);
   // const execution = spawn("ls")
   // execution.stdout.pipe(process.stdout)
   // ,command)
@@ -147,17 +147,18 @@ async function excuteCommand(command){
   // }
 }
 
-var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
-console.log(str)
-excuteCommand(str);
+// var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
+// console.log(str)
+// excuteCommand(str);
 
 
 args = process.argv.slice(2)
 console.log(args);
 if (args.length) {
-  executeArgumentsOnRemote(args)
-  excuteCommand(getRemoteCommandString(args))
-  var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
-  console.log(syncBuildToLocal)
-  excuteCommand(syncBuildToLocal)
+  const remoteCommand = getRemoteCommandString(args);
+  console.log("The remote command is ", remoteCommand)
+  excuteCommand(remoteCommand)
+  // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
+  // console.log(syncBuildToLocal)
+  // excuteCommand(syncBuildToLocal)
 }

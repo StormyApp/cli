@@ -15,7 +15,7 @@ const RSYNC = {
     NAME: 'rsync',
     ARGS: '-zvrlt',
     SPACE: ' ',
-    PATH_TO_KEY: '~\\buildexp_pair.pem',
+    PATH_TO_KEY: '/buildexp_pair.pem',
     EXCLUDED_FOLDERS: ['.stormy', '.git', 'node_modules'],
     DEST_FOLDER_USERNAME: 'ubuntu',
     IP: '3.6.95.176'
