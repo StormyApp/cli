@@ -151,13 +151,13 @@ var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder())
 console.log(str)
 excuteCommand(str);
 
-var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
-console.log(syncBuildToLocal)
-excuteCommand(syncBuildToLocal)
 
 args = process.argv.slice(2)
 console.log(args);
 if (args.length) {
   executeArgumentsOnRemote(args)
   excuteCommand(getRemoteCommandString(args))
+  var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
+  console.log(syncBuildToLocal)
+  excuteCommand(syncBuildToLocal)
 }
