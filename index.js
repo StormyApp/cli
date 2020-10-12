@@ -66,7 +66,11 @@ function getSourceFolder(){
 }
 
 function getCurrentFoder(){
-  var dir =  process.cwd().split('\\');
+  let splitter = '\\';
+  if(process.platform != 'win32'){
+    splitter = '/'
+  }
+  var dir =  process.cwd().split(splitter);
   return  dir[dir.length - 1];
 }
 
@@ -109,12 +113,12 @@ function getExecutablePath(name){
 
 function getUserKey(uid){
   const key =  __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
-  console.log("Trying to fetch the user key", key)
+  // console.log("Trying to fetch the user key", key)
   return key
 }
 
 async function excuteCommand(command){
-  console.log(command)
+  // console.log(command)
   var executor = exec(command);
 
   executor.stdout.on('data', function(data){
@@ -124,41 +128,20 @@ async function excuteCommand(command){
   
   executor.stderr.pipe(process.stderr);
   executor.stdin.pipe(process.stdin);
-  // const execution = spawn("ls")
-  // execution.stdout.pipe(process.stdout)
-  // ,command)
-  // execution.stdout.on('data', function (data) {
-  //   console.log('stdout: ' + data.toString());
-  // });
-  
-  // execution.stderr.on('data', function (data) {
-  //   console.log('stderr: ' + data.toString());
-  // });
-  
-  // execution.on('exit', function (code) {
-  //   console.log('child process exited with code ' + code.toString());
-  // });
-  // try{
-  //   const { stdout, stderr } = await exec(command);
-  //   console.log('stdout:', stdout);
-  //   console.error('stderr:', stderr);
-  // } catch(e){
-  //   console.log("There was an error processing the execute ccommand", e)
-  // }
 }
 
-// var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
+var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
 // console.log(str)
-// excuteCommand(str);
+excuteCommand(str);
 
 
 args = process.argv.slice(2)
 console.log(args);
 if (args.length) {
   const remoteCommand = getRemoteCommandString(args);
-  console.log("The remote command is ", remoteCommand)
+  // console.log("The remote command is ", remoteCommand)
   excuteCommand(remoteCommand)
-  // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
+  var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
   // console.log(syncBuildToLocal)
-  // excuteCommand(syncBuildToLocal)
+  excuteCommand(syncBuildToLocal)
 }
