@@ -1,10 +1,13 @@
 {
-  "name": "@rbansal16/stormy_build",
-  "version": "1.0.3",
+  "name": "stormy_build",
+  "version": "1.0.18",
   "description": "CLI tool for Stormy Build",
   "main": "./index.js",
   "bin": {
     "stormy": "./index.js"
+  },
+  "config": {
+    "publishtest": false
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,5 +17,6 @@
   "license": "ISC",
   "dependencies": {
   },
+  "preferGlobal": true,
   "devDependencies": {}
 }

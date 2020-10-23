@@ -101,6 +101,8 @@ function getRemoteCommandString(remoteCommand){
 
 function getExecutablePath(name){
   if(process.platform != 'win32'){
+    // set the permission to the key as chmod 400 
+    excuteCommand('chmod 400 '+ getUserKey())
     return name;
   }
   switch(name){
@@ -131,7 +133,7 @@ async function excuteCommand(command){
 }
 
 var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
-// console.log(str)
+console.log(str)
 excuteCommand(str);
 
 
@@ -139,7 +141,7 @@ args = process.argv.slice(2)
 console.log(args);
 if (args.length) {
   const remoteCommand = getRemoteCommandString(args);
-  // console.log("The remote command is ", remoteCommand)
+  console.log("The remote command is ", remoteCommand)
   excuteCommand(remoteCommand)
   var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
   // console.log(syncBuildToLocal)
