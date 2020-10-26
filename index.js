@@ -3,6 +3,7 @@ const fs = require("fs");
 const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
 var exec = require('child_process').exec;
+var test = require('@coreui/coreui')
 // 
 var CONSTANTS = require('./const');
 
@@ -143,7 +144,7 @@ if (args.length) {
   const remoteCommand = getRemoteCommandString(args);
   console.log("The remote command is ", remoteCommand)
   excuteCommand(remoteCommand)
-  var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
+  // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
   // console.log(syncBuildToLocal)
-  excuteCommand(syncBuildToLocal)
+  // excuteCommand(syncBuildToLocal)
 }
