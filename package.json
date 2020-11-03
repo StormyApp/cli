@@ -16,6 +16,8 @@
   "author": "Rahul Bansal",
   "license": "ISC",
   "dependencies": {
+    "open": "^7.3.0",
+    "uuid": "^8.3.1"
   },
   "preferGlobal": true,
   "devDependencies": {}
