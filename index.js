@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 const fs = require("fs");
+const { domain } = require("process");
 const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
 var exec = require('child_process').exec;
-var test = require('@coreui/coreui')
-// 
 var CONSTANTS = require('./const');
+var initService = require('./initService');
+const { init } = require("./initService");
+
 
 const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy/.ssh/id_rsa -C rabans"
 
@@ -23,27 +25,7 @@ async function writeToFile(content, filePath){
   return fs.promises.writeFile(filePath, content)
 }
 
-async function init(){
-  try {
-    createDir(CONSTANTS.BASE_FOLDER);
-    // initSSH();
-  } catch(e){
-    console.log("Error initiating the build", e)
-  }
-}
-
-async function createDir(targetDir) {
-  try {
-    let result = fs.existsSync(targetDir);
-    if (!result){
-      return fs.promises.mkdir(targetDir, { recursive: true });
-    }
-  } catch(e){
-    console.log("Error creating the folder/file", e)
-  }
-}
-
-init();
+initService.init();
 
 function getExcludedFolderString(excludedFolders){
   // var excludedFolders = CONSTANTS.EXCLUDED_FOLDERS;
@@ -91,7 +73,9 @@ function generateRsyncCommandString(sourceDir, destDir){
 
 
 function getCommandUtil(remoteCommand){
-  return " \" mkdir "+ getCurrentFoder()+";cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\""
+  // return 
+  // " \" mkdir "+ getCurrentFoder()+";+ 
+  return "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\"" 
 }
 
 function getRemoteCommandString(remoteCommand){
@@ -133,18 +117,60 @@ async function excuteCommand(command){
   executor.stdin.pipe(process.stdin);
 }
 
-var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
-console.log(str)
-excuteCommand(str);
-
-
-args = process.argv.slice(2)
-console.log(args);
-if (args.length) {
-  const remoteCommand = getRemoteCommandString(args);
-  console.log("The remote command is ", remoteCommand)
-  excuteCommand(remoteCommand)
-  // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
-  // console.log(syncBuildToLocal)
-  // excuteCommand(syncBuildToLocal)
+function executeCommandPromise(command){
+  console.log('In the Promise Function of execute Command')
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+       if (error) {
+           console.log('There is an error executing the command', error)
+          reject(error)  
+        } else {
+            console.log("There is no errror", stdout)
+            resolve(stdout? stdout : stderr);
+        }
+    });
+  });
 }
+
+async function parseArgs(){
+  var args = process.argv.slice(2);
+  switch(args[0]){
+    case 'login':
+      console.log("Inside the login Method")
+      var open = require('open')
+      var uud =  await initService.getUUID()
+      open('http://stormyapp.com/login/cli/' + uud)
+      break;
+    case init:
+      console.log('Inside the init method')
+      break;
+    default:
+      console.log('Inside the default method')
+      doMain()
+  }
+}
+
+parseArgs();
+
+function doMain() {
+  var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
+  // console.log("The Rsync string is",str)
+  var rsyncPromise = executeCommandPromise(str);
+    rsyncPromise.then(() => {
+    console.log('Waiting for rsync to finish')
+    args = process.argv.slice(2)
+    console.log(args);
+    if (args.length) {
+      const remoteCommand = getRemoteCommandString(args);
+      console.log("The remote command is ", remoteCommand)
+      excuteCommand(remoteCommand)
+      // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
+      // console.log(syncBuildToLocal)
+      // excuteCommand(syncBuildToLocal)
+    }
+
+  }).catch( (error) => {
+    console.log('There is an error in executing the rsync command', error)
+  })
+}
+
