@@ -9,7 +9,9 @@ const CONSTANTS = {
     REMOTE_MACHINE_USERNAME: '',
     REMOTE_MACHINE_SSH_ALIAS: '',
     CONFIG_FILE: BASE_FOLDER  + '/config.json',
-    RSYNC_COMMAND: ' rsync.exe  -zvrlt  -e "ssh -i .\buildexp_pair.pem" ./rsync-test-folder/ ubuntu@15.207.98.234:~/rsync-test-folder'
+    RSYNC_COMMAND: ' rsync.exe  -zvrlt  -e "ssh -i .\buildexp_pair.pem" ./rsync-test-folder/ ubuntu@15.207.98.234:~/rsync-test-folder',
+    // STAGING_URL: 'http://stormyserver-env.eba-iehvzmsc.ap-south-1.elasticbeanstalk.com/'
+    STAGING_URL: 'http://localhost:8080/'
 }
 
 const RSYNC = {

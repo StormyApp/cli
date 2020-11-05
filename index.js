@@ -5,8 +5,8 @@ const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
 var exec = require('child_process').exec;
 var CONSTANTS = require('./const');
+const { registerCLI } = require("./httpClient");
 var initService = require('./initService');
-const { init } = require("./initService");
 
 
 const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy/.ssh/id_rsa -C rabans"
@@ -25,7 +25,7 @@ async function writeToFile(content, filePath){
   return fs.promises.writeFile(filePath, content)
 }
 
-initService.init();
+// initService.init();
 
 function getExcludedFolderString(excludedFolders){
   // var excludedFolders = CONSTANTS.EXCLUDED_FOLDERS;
@@ -134,14 +134,32 @@ function executeCommandPromise(command){
 
 async function parseArgs(){
   var args = process.argv.slice(2);
+  console.log(args[0])
   switch(args[0]){
     case 'login':
       console.log("Inside the login Method")
       var open = require('open')
-      var uud =  await initService.getUUID()
-      open('http://stormyapp.com/login/cli/' + uud)
+      // var uud =  await initService.getUUID()
+      // In the future redirect the user to the github
+      // open('http://api.stormyapp.com/login/cli/' + uud)
+
+      // Make an API call today to fetch the details from the body
       break;
-    case init:
+    case 'init':
+      // make a rquest to server
+      var globalConfig = await initService.init();
+      console.log('Inside the init')
+      var uuid =  await initService.getUUID()
+      if ( globalConfig && !globalConfig['userCreated']){
+        try {
+          var result = await registerCLI(uuid);
+          globalConfig['userCreated'] = true
+        }
+        catch(e){
+          console.log('There is an error in creating the user', e)
+        }
+      }
+      initService.writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
       console.log('Inside the init method')
       break;
     default:

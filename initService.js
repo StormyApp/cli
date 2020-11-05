@@ -1,8 +1,12 @@
 const { resolveCname } = require('dns');
+const { write } = require('fs');
+const { globalAgent } = require('http');
 const { config } = require('process');
 const { v4: uuidv4 } = require('uuid');
 fs = require('fs')
 CONSTANTS = require('./const')
+
+var globalConfig = {}
 
 function createDir(targetDir) {
     try {
@@ -13,6 +17,11 @@ function createDir(targetDir) {
     } catch(e){
       console.log("Error creating the folder/file", e)
     }
+}
+
+function addKey(key, value) {
+    globalConfig[key] = value;
+    return writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
 }
 
 function writeConfigJson(configLocation, configJson){
@@ -30,18 +39,29 @@ function writeConfigJson(configLocation, configJson){
 }
 
 async function getUUID() {
-    var uuid = await readConfigJson(CONSTANTS.CONFIG_FILE);
-    console.log(uuid)
-    if (uuid){
-        return uuid
-    } else {
-        var uud = uuidv4()
-        writeConfigJson(CONSTANTS.CONFIG_FILE, uud)
-        return uud;
+    
+    if (globalConfig && globalConfig['uuid']){
+        console.log('Fetching the global value of the uuid', globalConfig['uuid'])
+        return globalConfig['uuid']
     }
+
+    var uud = uuidv4().split('-').join('')
+    globalConfig['uuid'] = uud
+    writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
+    return uud;
+}
+
+const getGlobalConfig = () => {
+    if ( Object.keys(globalConfig).length !== 0){
+        return globalConfig
+    }
+    // Read the value from the user
 }
 
 function readConfigJson(configLocation){
+    let result = fs.existsSync(configLocation);
+    if (!result)
+        return '{}'
     return new Promise((resolve, reject) => {
         fs.readFile(configLocation, 'utf8', (err, data) => {
             if(err){
@@ -58,10 +78,13 @@ async function init(){
     try {
         var initFile = CONSTANTS.CONFIG_FILE;
         createDir(CONSTANTS.BASE_FOLDER);
-        var configJson = await readConfigJson(initFile);
-        return configJson
+        globalConfig = JSON.parse(await readConfigJson(initFile));
+        console.log('The value of the globalConfig value', globalConfig)
+        return globalConfig;
     } catch(e){
       console.log("Error initiating the build", e)
+      globalConfig = {}
+      return globalConfig
     }
 }
 
@@ -70,5 +93,7 @@ module.exports = {
     createDir,
     init,
     writeConfigJson,
-    getUUID
+    getUUID,
+    globalConfig,
+    addKey
 }
