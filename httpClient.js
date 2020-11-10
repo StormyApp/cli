@@ -1,10 +1,18 @@
 const axios = require('axios');
 var CONSTANTS = require('./const')
 
-function registerCLI(uuid){
+function registerCLI(uuid, publicKey){
     var URL = CONSTANTS.STAGING_URL + 'key/' + uuid
-    console.log('Making a request to the URL', URL)
-    return axios.get(URL)
+    console.log('The public key is', publicKey)
+    // console.log('Making a request to the URL', URL)
+    return axios({
+        method: 'post',
+        url: URL,
+        data: {
+          publicKey: publicKey
+        }
+    })
+    // return axios.get(URL)
 }
 
 module.exports = {

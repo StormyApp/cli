@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require("fs");
+const { globalAgent } = require("http");
 const { domain } = require("process");
 const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
@@ -7,7 +8,9 @@ var exec = require('child_process').exec;
 var CONSTANTS = require('./const');
 const { registerCLI } = require("./httpClient");
 var initService = require('./initService');
-
+var globalConfig = {}
+var utilService = require('./utilService');
+var sshService = require('./sshService')
 
 const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy/.ssh/id_rsa -C rabans"
 
@@ -117,22 +120,18 @@ async function excuteCommand(command){
   executor.stdin.pipe(process.stdin);
 }
 
-function executeCommandPromise(command){
-  console.log('In the Promise Function of execute Command')
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-       if (error) {
-           console.log('There is an error executing the command', error)
-          reject(error)  
-        } else {
-            console.log("There is no errror", stdout)
-            resolve(stdout? stdout : stderr);
-        }
-    });
-  });
+async function init(){
+  globalConfig = await initService.init()
+  if ( globalConfig && !globalConfig['keyCreated']){
+    await sshService.sshKeyGen()
+    globalConfig['keyCreated'] = true
+    
+  }
+  return globalConfig
 }
 
 async function parseArgs(){
+  globalConfig = await init()
   var args = process.argv.slice(2);
   console.log(args[0])
   switch(args[0]){
@@ -147,12 +146,13 @@ async function parseArgs(){
       break;
     case 'init':
       // make a rquest to server
-      var globalConfig = await initService.init();
       console.log('Inside the init')
       var uuid =  await initService.getUUID()
       if ( globalConfig && !globalConfig['userCreated']){
         try {
-          var result = await registerCLI(uuid);
+          var result = await registerCLI(uuid, sshService.readPublicKey());
+          console.log('The result is', result)
+          globalConfig['guuid'] = result.data['guuid']
           globalConfig['userCreated'] = true
         }
         catch(e){
@@ -173,7 +173,7 @@ parseArgs();
 function doMain() {
   var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
   // console.log("The Rsync string is",str)
-  var rsyncPromise = executeCommandPromise(str);
+  var rsyncPromise = utilService.executeCommandPromise(str);
     rsyncPromise.then(() => {
     console.log('Waiting for rsync to finish')
     args = process.argv.slice(2)

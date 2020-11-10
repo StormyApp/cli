@@ -22,7 +22,8 @@ const RSYNC = {
     EXCLUDED_FOLDERS: ['.stormy', '.git', 'node_modules', '.idea', 'app/build', '.next'],
     DEST_FOLDER_USERNAME: 'ubuntu',
     // IP: '3.6.95.176',
-    IP: '65.0.74.19'
+    IP: '65.0.74.19',
+    IP: '15.206.117.201'
 }
 
 module.exports = {
