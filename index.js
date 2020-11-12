@@ -133,7 +133,7 @@ async function init(){
 async function parseArgs(){
   globalConfig = await init()
   var args = process.argv.slice(2);
-  console.log(args[0])
+  // console.log(args[0])
   switch(args[0]){
     case 'login':
       console.log("Inside the login Method")
@@ -146,7 +146,7 @@ async function parseArgs(){
       break;
     case 'init':
       // make a rquest to server
-      console.log('Inside the init')
+      // console.log('Inside the init')
       var uuid =  await initService.getUUID()
       if ( globalConfig && !globalConfig['userCreated']){
         try {
@@ -154,13 +154,15 @@ async function parseArgs(){
           console.log('The result is', result)
           globalConfig['guuid'] = result.data['guuid']
           globalConfig['userCreated'] = true
+          console.log('....... INIT Done Successfully .........')
         }
         catch(e){
           console.log('There is an error in creating the user', e)
         }
+      } else {
+        console.log('....... You have already completed INIT .........')
       }
       initService.writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
-      console.log('Inside the init method')
       break;
     default:
       if ( !isInitComplete(globalConfig) )
@@ -173,7 +175,7 @@ async function parseArgs(){
 }
 
 const isInitComplete = (globalConfig) => {
-  console.log('The values of the globalConfig values are', globalConfig)
+  // console.log('The values of the globalConfig values are', globalConfig)
   if ( !globalConfig )
     return false
   if ( !globalConfig['uuid'])
