@@ -17,7 +17,7 @@ const isKeyPresent = () => {
 }
 
 const readPublicKey = () => {
-    return fs.readFileSync(CONSTANTS.SSH_PUBLIC_KEY_FILE, 'utf8')
+    return fs.readFileSync(CONSTANTS.SSH_PUBLIC_KEY_FILE, 'utf8').replace(/\r?\n|\r/g, " ");
 }
 
 const getSSHGenCommand = () => {
