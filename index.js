@@ -61,7 +61,7 @@ function getCurrentFoder(){
 }
 
 function pathToRemoteFolder(folderName){
-  return CONSTANTS.RSYNC.DEST_FOLDER_USERNAME + '@' + CONSTANTS.RSYNC.IP  + ":~/" + folderName 
+  return globalConfig['uuid'] + '@' + CONSTANTS.RSYNC.IP  + ":~/" + folderName 
 }
 
 function generateRsyncCommandString(sourceDir, destDir){
@@ -102,7 +102,9 @@ function getExecutablePath(name){
 }
 
 function getUserKey(uid){
-  const key =  __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
+  const key =  CONSTANTS.SSH_PRIVATE_KEY_FILE
+  // Path to the global private key file
+  // __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
   // console.log("Trying to fetch the user key", key)
   return key
 }
@@ -168,7 +170,7 @@ async function parseArgs(){
       if ( !isInitComplete(globalConfig) )
         console.log('Please run the init method')
       else {
-        // console.log('Inside the doMain method')
+        console.log('Inside the doMain method')
         doMain();
       }
   }

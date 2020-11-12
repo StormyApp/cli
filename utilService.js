@@ -1,7 +1,7 @@
 var exec = require('child_process').exec;
 
 function executeCommandPromise(command){
-    console.log('In the Promise Function of execute Command')
+    console.log('In the Promise Function of execute Command', command)
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
          if (error) {
