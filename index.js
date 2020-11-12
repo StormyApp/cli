@@ -163,9 +163,31 @@ async function parseArgs(){
       console.log('Inside the init method')
       break;
     default:
-      console.log('Inside the default method')
-      doMain()
+      if ( !isInitComplete(globalConfig) )
+        console.log('Please run the init method')
+      else {
+        // console.log('Inside the doMain method')
+        doMain();
+      }
   }
+}
+
+const isInitComplete = (globalConfig) => {
+  console.log('The values of the globalConfig values are', globalConfig)
+  if ( !globalConfig )
+    return false
+  if ( !globalConfig['uuid'])
+    return false
+  if (!globalConfig['keyCreated'])
+    return false
+  if (!globalConfig['guuid']){
+    return false
+  }
+  return true
+}
+
+const getEmail = () => {
+  console.log('Please enter your email to continue')
 }
 
 parseArgs();
