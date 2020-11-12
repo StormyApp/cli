@@ -78,8 +78,10 @@ async function init(){
     try {
         var initFile = CONSTANTS.CONFIG_FILE;
         createDir(CONSTANTS.BASE_FOLDER);
-        globalConfig = JSON.parse(await readConfigJson(initFile));
-        console.log('The value of the globalConfig value', globalConfig)
+        globalConfigFile = await readConfigJson(initFile);
+        if (globalConfigFile !== "")
+            globalConfig = JSON.parse(globalConfigFile)
+        // console.log('The value of the globalConfig value', globalConfig)
         return globalConfig;
     } catch(e){
       console.log("Error initiating the build", e)
