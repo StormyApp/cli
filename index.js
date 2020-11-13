@@ -61,17 +61,19 @@ function getCurrentFoder(){
 }
 
 function pathToRemoteFolder(folderName){
-  return globalConfig['uuid'] + '@' + CONSTANTS.RSYNC.IP  + ":~/" + folderName 
+  return globalConfig['uuid'] + '@' + CONSTANTS.RSYNC.IP + ":~/" + folderName 
 }
 
 function generateRsyncCommandString(sourceDir, destDir){
   return getExecutablePath (CONSTANTS.RSYNC.NAME) + 
-   CONSTANTS.RSYNC.SPACE  +
+  //  CONSTANTS.RSYNC.SPACE  + CONSTANTS.RSYNC.SKIP_TIME 
+  CONSTANTS.RSYNC.SPACE 
+   + CONSTANTS.RSYNC.SPACE +
   CONSTANTS.RSYNC.ARGS + CONSTANTS.RSYNC.SPACE  +
   getExcludedFolderString(CONSTANTS.RSYNC.EXCLUDED_FOLDERS) + CONSTANTS.RSYNC.SPACE  +
   getSSHCommandString() + CONSTANTS.RSYNC.SPACE +
   sourceDir + CONSTANTS.RSYNC.SPACE  +
-  destDir + CONSTANTS.RSYNC.SPACE
+  destDir
 }
 
 
@@ -81,10 +83,11 @@ function getCommandUtil(remoteCommand){
   return "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\"" 
 }
 
-function getRemoteCommandString(remoteCommand){
-  return getExecutablePath('ssh') +' -i ' + getUserKey()+ ' ' + 
-  CONSTANTS.RSYNC.DEST_FOLDER_USERNAME + 
+function getRemoteCommandString(remoteCommand, globalConfig){
+  var uuid = globalConfig.uuid;
+  var command = getExecutablePath('ssh') +' -i ' + getUserKey()+ ' ' +  uuid +
   '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
+  return command;
 }
 
 function getExecutablePath(name){
@@ -102,7 +105,7 @@ function getExecutablePath(name){
 }
 
 function getUserKey(uid){
-  const key =  CONSTANTS.SSH_PRIVATE_KEY_FILE
+  const key =  process.cwd() + '/'+ CONSTANTS.SSH_PRIVATE_KEY_FILE
   // Path to the global private key file
   // __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
   // console.log("Trying to fetch the user key", key)
@@ -171,7 +174,7 @@ async function parseArgs(){
         console.log('Please run the init method')
       else {
         console.log('Inside the doMain method')
-        doMain();
+        doMain(globalConfig);
       }
   }
 }
@@ -196,16 +199,17 @@ const getEmail = () => {
 
 parseArgs();
 
-function doMain() {
+function doMain(globalConfig) {
   var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
-  // console.log("The Rsync string is",str)
+  console.log("The Rsync string is",str)
   var rsyncPromise = utilService.executeCommandPromise(str);
     rsyncPromise.then(() => {
     console.log('Waiting for rsync to finish')
+    console.log('The globalConfig', globalConfig)
     args = process.argv.slice(2)
     console.log(args);
     if (args.length) {
-      const remoteCommand = getRemoteCommandString(args);
+      const remoteCommand = getRemoteCommandString(args, globalConfig);
       console.log("The remote command is ", remoteCommand)
       excuteCommand(remoteCommand)
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
