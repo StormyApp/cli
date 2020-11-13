@@ -17,6 +17,7 @@ const CONSTANTS = {
 const RSYNC = {
     NAME: 'rsync',
     ARGS: '-zvrlt',
+    SKIP_TIME: '--omit-dir-times',
     SPACE: ' ',
     PATH_TO_KEY: '/buildexp_pair.pem',
     EXCLUDED_FOLDERS: ['.stormy', '.git', 'node_modules', '.idea', 'app/build', '.next'],
