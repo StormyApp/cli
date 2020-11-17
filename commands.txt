@@ -28,6 +28,7 @@ wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
 
 
 
+: C:\Users\rabans\stormy_build_cli/DeltaCopy/rsync -zvrlt  --exclude .stormy  --exclude .git  --exclude node_modules  --exclude .idea  --exclude app/build  --exclude .next  -e "C:\Users\rabans\stormy_build_cli/DeltaCopy/ssh -i .stormy/.ssh/id_rsa" ./ 4ad354808b944c43adc1a76bdfa9881e@13.127.110.225:~/testu
 
 https://stackoverflow.com/questions/60440509/android-command-line-tools-sdkmanager-always-shows-warning-could-not-create-se
 
@@ -37,3 +38,14 @@ https://dl.google.com/android/repository/cmake_3.10.2.4988404-linux.zip
 https://dl.google.com/android/repository/cmake-3.10.2.4988404-linux-x64.zip
 
 
+
+Creating the keys silently ubuntu
+ssh-keygen -t rsa -f /home/oracle/.ssh/id_rsa -q -P ""
+
+Creating the keys on windows
+
+
+Commands for making the cat command  work
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
