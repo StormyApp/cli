@@ -1,4 +1,3 @@
-console.log('The value of the process env is', process.env.REACT_APP_SERVER)
 const BASE_FOLDER = '.stormy'
 const CONSTANTS = {
     SSH_FOLDER: BASE_FOLDER + '/.ssh',
