@@ -2,7 +2,7 @@ const axios = require('axios');
 var CONSTANTS = require('./const')
 
 function registerCLI(uuid, publicKey){
-    var URL = CONSTANTS.STAGING_URL + 'key/' + uuid
+    var URL = CONSTANTS.SERVER_URL + 'key/' + uuid
     console.log('The public key is', publicKey)
     // console.log('Making a request to the URL', URL)
     return axios({

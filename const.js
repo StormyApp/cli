@@ -1,3 +1,4 @@
+console.log('The value of the process env is', process.env.REACT_APP_SERVER)
 const BASE_FOLDER = '.stormy'
 const CONSTANTS = {
     SSH_FOLDER: BASE_FOLDER + '/.ssh',
@@ -10,8 +11,7 @@ const CONSTANTS = {
     REMOTE_MACHINE_SSH_ALIAS: '',
     CONFIG_FILE: BASE_FOLDER  + '/config.json',
     RSYNC_COMMAND: ' rsync.exe  -zvrlt  -e "ssh -i .\buildexp_pair.pem" ./rsync-test-folder/ ubuntu@15.207.98.234:~/rsync-test-folder',
-    // STAGING_URL: 'http://stormyserver-env.eba-iehvzmsc.ap-south-1.elasticbeanstalk.com/'
-    STAGING_URL: 'http://localhost:8080/'
+    SERVER_URL: process.env.REACT_APP_SERVER ? process.env.REACT_APP_SERVER: 'http://stormyserver-env.eba-iehvzmsc.ap-south-1.elasticbeanstalk.com'
 }
 
 const RSYNC = {

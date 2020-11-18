@@ -2,3 +2,4 @@ node_modules
 .stormy
 output
 extra commands.txt
+local.env
