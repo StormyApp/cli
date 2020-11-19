@@ -82,7 +82,7 @@ function generateRsyncCommandString(sourceDir, destDir){
 function getCommandUtil(remoteCommand){
   // return 
   // " \" mkdir "+ getCurrentFoder()+";+ 
-  return "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\"" 
+  return "\"" + "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\"" 
 }
 
 function getRemoteCommandString(remoteCommand, globalConfig){
