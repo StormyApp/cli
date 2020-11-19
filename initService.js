@@ -38,6 +38,19 @@ function writeConfigJson(configLocation, configJson){
     });
 }
 
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return 'a'+result;
+ }
+ 
+
+
 async function getUUID() {
     
     if (globalConfig && globalConfig['uuid']){
@@ -45,7 +58,8 @@ async function getUUID() {
         return globalConfig['uuid']
     }
 
-    var uud = uuidv4().split('-').join('')
+    var uud = makeid(30);
+    // 'd'+uuidv4().split('-').join('')
     globalConfig['uuid'] = uud
     writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
     return uud;
