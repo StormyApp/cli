@@ -85,9 +85,9 @@ function getCommandUtil(remoteCommand){
   return "\"" + "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\"" 
 }
 
-function getRemoteCommandString(remoteCommand, globalConfig){
+function getRemoteCommandString(remoteCommand, globalConfig, getTerminal){
   var uuid = globalConfig.uuid;
-  var command = getExecutablePath('ssh') +' -i ' + getUserKey()+ ' ' +  uuid +
+  var command = getExecutablePath('ssh') + getTerminal?' -t ':'' + +' -i ' + getUserKey()+ ' ' +  uuid +
   '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
   return command;
 }
@@ -211,7 +211,7 @@ function doMain(globalConfig) {
     args = process.argv.slice(2)
     console.log(args);
     if (args.length) {
-      const remoteCommand = getRemoteCommandString(args, globalConfig);
+      const remoteCommand = getRemoteCommandString(args, globalConfig, true);
       console.log("The remote command is ", remoteCommand)
       excuteCommand(remoteCommand)
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
