@@ -2,7 +2,6 @@ const { resolveCname } = require('dns');
 const { write } = require('fs');
 const { globalAgent } = require('http');
 const { config } = require('process');
-const { v4: uuidv4 } = require('uuid');
 fs = require('fs')
 CONSTANTS = require('./const')
 
