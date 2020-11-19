@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const fs = require("fs");
-const { globalAgent } = require("http");
+const { globalAgent, get } = require("http");
 const { domain } = require("process");
 const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
@@ -87,8 +87,11 @@ function getCommandUtil(remoteCommand){
 
 function getRemoteCommandString(remoteCommand, globalConfig, getTerminal){
   var uuid = globalConfig.uuid;
-  var command = getExecutablePath('ssh') + getTerminal?' -t ':'' + +' -i ' + getUserKey()+ ' ' +  uuid +
-  '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
+  var command = getExecutablePath('ssh') ; 
+  if ( getTerminal) {
+    command = command + ' -t '
+  }
+  command = command +' -i ' + getUserKey()+ ' ' +  uuid + '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
   return command;
 }
 
