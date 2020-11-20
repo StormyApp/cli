@@ -89,7 +89,7 @@ function getRemoteCommandString(remoteCommand, globalConfig, getTerminal){
   var uuid = globalConfig.uuid;
   var command = getExecutablePath('ssh') ; 
   if ( getTerminal) {
-    command = command + ' -t '
+    // command = command + ' -T '
   }
   command = command +' -i ' + getUserKey()+ ' ' +  uuid + '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
   return command;
