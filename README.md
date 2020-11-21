@@ -2,13 +2,13 @@
 
 ![Build](https://github.com/railwayapp/cli/workflows/Build/badge.svg)
 
-This is the command line interface for [Railway](https://stormyapp.com). Use it to connect your code to Railways infrastructure without needing to worry about environment variables or configuration.
+This is the command line interface for [Stormy](https://stormyapp.com). Use it to speed up your compilation by 70%.
 
 [View the docs](https://stormyapp.com/docs/cli)
 
 ## Installation
 
-The Railway CLI is available through [NPM](https://www.npmjs.com/package/stormy_build).
+The Stormy CLI is available through [NPM](https://www.npmjs.com/package/stormy_build).
 
 ### NPM
 
