@@ -10,7 +10,7 @@ const CONSTANTS = {
     REMOTE_MACHINE_SSH_ALIAS: '',
     CONFIG_FILE: BASE_FOLDER  + '/config.json',
     RSYNC_COMMAND: ' rsync.exe  -zvrlt  -e "ssh -i .\buildexp_pair.pem" ./rsync-test-folder/ ubuntu@15.207.98.234:~/rsync-test-folder',
-    SERVER_URL: process.env.REACT_APP_SERVER ? process.env.REACT_APP_SERVER: 'http://stormyserver20-env.eba-p6m3muhi.ap-south-1.elasticbeanstalk.com/'
+    SERVER_URL: process.env.REACT_APP_SERVER ? process.env.REACT_APP_SERVER: 'http://stormyserver20-env.eba-p6m3muhi.ap-south-1.elasticbeanstalk.com'
 }
 
 const RSYNC = {
