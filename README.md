@@ -18,6 +18,17 @@ npm i -g stormy_build
 
 ## Documentation
 
+Init the stormy in your project folder.
+
+```shell
+stormy init
+```
+
+Start Executing commands in the project folder like build etc.
+
+```shell
+stormy command_to_be_executed
+```
 [View the full documentation](https://stormyapp.com/docs/cli)
 
 ## Feedback
