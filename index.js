@@ -6,12 +6,12 @@ const util = require('util');
 // const exec = util.promisify(require('child_process').exec);
 var exec = require('child_process').exec;
 require('dotenv').config({path: __dirname +'/' + 'local.env'});
-var CONSTANTS = require('./const');
-const { registerCLI } = require("./httpClient");
-var initService = require('./initService');
+var CONSTANTS = require('./src/const');
+const { registerCLI } = require("./src/httpClient");
+var initService = require('./src/initService');
 var globalConfig = {}
-var utilService = require('./utilService');
-var sshService = require('./sshService')
+var utilService = require('./src/utilService');
+var sshService = require('./src/sshService')
 
 
 const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy/.ssh/id_rsa -C rabans"
