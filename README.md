@@ -1,3 +1,27 @@
-# stormy
+# Stormy CLI
 
-Cli Tool to boost the productivity of developers by decreasing the build and compile time on the Developers local machine.
+![Build](https://github.com/railwayapp/cli/workflows/Build/badge.svg)
+
+This is the command line interface for [Stormy](https://stormyapp.com). Use it to speed up your compilation by 70%.
+
+[View the docs](https://stormyapp.com/docs/cli)
+
+## Installation
+
+The Stormy CLI is available through [NPM](https://www.npmjs.com/package/stormy_build).
+
+### NPM
+
+```shell
+npm i -g stormy_build
+```
+
+## Documentation
+
+[View the full documentation](https://stormyapp.com/docs/cli)
+
+## Feedback
+
+We would love to hear your feedback or suggestions. The best way to reach us is on [Discord]().
+
+We also welcome pull requests into this repo. See [CONTRIBUTING.md]() information on setting up this repo locally.
