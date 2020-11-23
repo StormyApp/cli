@@ -136,10 +136,10 @@ async function excuteCommand(command){
   // console.log(command)
   var executor = exec(command);
 
-  executor.stdout.on('data', function(data){
-    var p = data.replace('localhost', CONSTANTS.RSYNC.IP)
-    process.stdout.write(p)
-  })
+  // executor.stdout.on('data', function(data){
+  //   // var p = data.replace('localhost', CONSTANTS.RSYNC.IP)
+  //   process.stdout.write(p)
+  // })
   
   executor.stderr.pipe(process.stderr);
   executor.stdin.pipe(process.stdin);
