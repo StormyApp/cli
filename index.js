@@ -12,7 +12,21 @@ var initService = require('./src/initService');
 var globalConfig = {}
 var utilService = require('./src/utilService');
 var sshService = require('./src/sshService')
-
+var colors = require('colors');
+ 
+colors.setTheme({
+  silly: 'rainbow',
+  input: 'grey',
+  verbose: 'cyan',
+  prompt: 'grey',
+  info: 'green',
+  data: 'grey',
+  help: 'cyan',
+  warn: 'yellow',
+  debug: 'blue',
+  error: 'red',
+  success: 'pink',
+});
 
 const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy/.ssh/id_rsa -C rabans"
 
@@ -160,17 +174,36 @@ async function parseArgs(){
       var uuid =  await initService.getUUID()
       if ( globalConfig && !globalConfig['userCreated']){
         try {
-          var result = await registerCLI(uuid, sshService.readPublicKey());
-          console.log('The result is', result)
-          globalConfig['guuid'] = result.data['guuid']
+          const readline = require('readline').createInterface({
+            input: process.stdin,
+            output: process.stdout
+          });
+          // console.log(colors.input("What is the default port that your application run?"))
+
+          // var result = await registerCLI(uuid, sshService.readPublicKey());
+          // console.log('The result is', result)
+          // utilService.logInput()
+          // globalConfig['guuid'] = result.data['guuid']
           globalConfig['userCreated'] = true
-          console.log('....... INIT Done Successfully .........')
+          // readline.input();
+          console.log(colors.info('....... INIT Done Successfully .........'))
+          readline.question('What is the default port to run your application?', port => {
+            console.log(`You have chosen the default port: ${port}`);
+            globalConfig['port'] = port
+            console.log(colors.info('If you want to change it in future go to your config file'))
+            console.log(colors.info(CONSTANTS.CONFIG_FILE))
+            readline.close();
+            initService.writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
+            // console.log(colors.info('Your configuration file is located in', CONSTANTS.CONFIG_FILE))
+          });
         }
         catch(e){
-          console.log('There is an error in creating the user', e)
+          console.log(colors.error('Getting some error initializing stormy'),e)
+          console.log(colors.info('Please contact us on'))
+          console.log(colors.info('https://twitter.com/AppStormy'))
         }
       } else {
-        console.log('....... You have already completed INIT .........')
+        console.log(colors.info('....... You have already completed INIT .........'))
       }
       initService.writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
       break;
@@ -178,7 +211,7 @@ async function parseArgs(){
       if ( !isInitComplete(globalConfig) )
         console.log('Please run the init method')
       else {
-        console.log('Inside the doMain method')
+        // console.log('Inside the doMain ')
         doMain(globalConfig);
       }
   }
@@ -215,7 +248,7 @@ function doMain(globalConfig) {
     console.log(args);
     if (args.length) {
       const remoteCommand = getRemoteCommandString(args, globalConfig, true);
-      console.log("The remote command is ", remoteCommand)
+      // console.log("The remote command is ", remoteCommand)
       excuteCommand(remoteCommand)
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
       // console.log(syncBuildToLocal)

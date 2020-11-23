@@ -1,7 +1,8 @@
 var exec = require('child_process').exec;
+const colors = require('colors');
 
 function executeCommandPromise(command){
-    console.log('In the Promise Function of execute Command', command)
+    // console.log('In the Promise Function of execute Command', command)
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
          if (error) {
@@ -13,6 +14,18 @@ function executeCommandPromise(command){
           }
       });
     });
+}
+
+function logError(message) {
+  // console.log(colors.red(message))
+}
+
+function logInput(message){
+  // console.log(colors.setTheme(message))
+}
+
+function logSuccess(message){
+  // console.log(colors.green(message));
 }
 
 function createDir(targetDir) {
@@ -28,7 +41,10 @@ function createDir(targetDir) {
 
 module.exports = {
     executeCommandPromise,
-    createDir
+    createDir,
+    logSuccess,
+    logError,
+    logInput
 }
 
   

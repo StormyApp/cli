@@ -24,7 +24,8 @@ function addKey(key, value) {
 }
 
 function writeConfigJson(configLocation, configJson){
-    console.log('The configLocation is', configLocation)
+    // console.log('\n\nThe configLocation is', configLocation)
+    // console.log('\n\n')
     return new Promise((resolve, reject) =>{
         fs.writeFile(configLocation, configJson, function(err){
             if (err){
@@ -53,7 +54,7 @@ function makeid(length) {
 async function getUUID() {
     
     if (globalConfig && globalConfig['uuid']){
-        console.log('Fetching the global value of the uuid', globalConfig['uuid'])
+        // console.log('Fetching the global value of the uuid', globalConfig['uuid'])
         return globalConfig['uuid']
     }
 
