@@ -4,10 +4,6 @@ const CONSTANTS = {
     SSH_PUBLIC_KEY_FILE: BASE_FOLDER + '/.ssh/id_rsa.pub',
     SSH_PRIVATE_KEY_FILE: BASE_FOLDER + '/.ssh/id_rsa',
     SSH_CONFIG: BASE_FOLDER + '/.ssh/config',
-    REMOTE_MACHINE_IP_OR_HOSTNAME: '',
-    REMOTE_MACHINE_SSH_PORT: '',
-    REMOTE_MACHINE_USERNAME: '',
-    REMOTE_MACHINE_SSH_ALIAS: '',
     CONFIG_FILE: BASE_FOLDER  + '/config.json',
     RSYNC_COMMAND: ' rsync.exe  -zvrlt  -e "ssh -i .\buildexp_pair.pem" ./rsync-test-folder/ ubuntu@15.207.98.234:~/rsync-test-folder',
     SERVER_URL: process.env.REACT_APP_SERVER ? process.env.REACT_APP_SERVER: 'http://stormyserver20-env.eba-p6m3muhi.ap-south-1.elasticbeanstalk.com'

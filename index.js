@@ -13,6 +13,7 @@ var globalConfig = {}
 var utilService = require('./src/utilService');
 var sshService = require('./src/sshService')
 var colors = require('colors');
+var nodeSSHService = require('./src/nodeSSHService');
  
 colors.setTheme({
   silly: 'rainbow',
@@ -178,14 +179,9 @@ async function parseArgs(){
             input: process.stdin,
             output: process.stdout
           });
-          // console.log(colors.input("What is the default port that your application run?"))
-
-          // var result = await registerCLI(uuid, sshService.readPublicKey());
-          // console.log('The result is', result)
-          // utilService.logInput()
-          // globalConfig['guuid'] = result.data['guuid']
+          var result = await registerCLI(uuid, sshService.readPublicKey());
+          globalConfig['guuid'] = result.data['guuid']
           globalConfig['userCreated'] = true
-          // readline.input();
           console.log(colors.info('....... INIT Done Successfully .........'))
           readline.question('What is the default port to run your application?', port => {
             console.log(`You have chosen the default port: ${port}`);
@@ -238,6 +234,7 @@ const getEmail = () => {
 parseArgs();
 
 function doMain(globalConfig) {
+  nodeSSHService.portForward(globalConfig['uuid'], globalConfig['port'], globalConfig['port']);
   var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
   console.log("The Rsync string is",str)
   var rsyncPromise = utilService.executeCommandPromise(str);
