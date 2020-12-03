@@ -141,7 +141,7 @@ async function parseArgs(){
   switch(args[0]){
     case 'login':
       console.log("Inside the login Method")
-      var open = require('open')
+      // var open = require('open')
       // var uud =  await initService.getUUID()
       // In the future redirect the user to the github
       // open('http://api.stormyapp.com/login/cli/' + uud)
