@@ -140,7 +140,13 @@ async function excuteCommand(command){
   //   // var p = data.replace('localhost', CONSTANTS.RSYNC.IP)
   //   process.stdout.write(p)
   // })
-  
+  // executor.stderr.on('data', function(data){
+  //   const terminalLink = require('terminal-link');
+  //   const link = terminalLink(data, 'https://www.google.com/search?q='+data);
+  //   process.stderr.write(link)
+  //   // console.log(link);
+  // })
+  executor.stdout.pipe(process.stdout);
   executor.stderr.pipe(process.stderr);
   executor.stdin.pipe(process.stdin);
 }

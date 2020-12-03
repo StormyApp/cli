@@ -15,6 +15,14 @@ function registerCLI(uuid, publicKey){
     // return axios.get(URL)
 }
 
+function wakeUpTheServer(){
+    var URL = CONSTANTS.SERVER_URL + '/wakeup'
+    return axios({
+        method: 'Get',
+        url: URL
+    })
+}
+
 module.exports = {
     registerCLI
 }
