@@ -23,6 +23,20 @@ function wakeUpTheServer(){
     })
 }
 
+function executingCommand(uuid, command, status){
+    var URL = CONSTANTS.SERVER_URL + '/command'
+    return axios({
+        method: 'post',
+        url: URL,
+        data: {
+            uuid: uuid,
+            command: command,
+            status: status
+        }
+    })
+}
+
 module.exports = {
-    registerCLI
+    registerCLI,
+    executingCommand
 }

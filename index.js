@@ -1,13 +1,8 @@
 #!/usr/bin/env node
-const fs = require("fs");
-const { globalAgent, get } = require("http");
-const { domain } = require("process");
-const util = require('util');
-// const exec = util.promisify(require('child_process').exec);
 var exec = require('child_process').exec;
 require('dotenv').config({path: __dirname +'/' + 'local.env'});
 var CONSTANTS = require('./src/const');
-const { registerCLI } = require("./src/httpClient");
+const { registerCLI,executingCommand } = require("./src/httpClient");
 var initService = require('./src/initService');
 var globalConfig = {}
 var utilService = require('./src/utilService');
@@ -29,24 +24,6 @@ colors.setTheme({
   success: 'pink',
 });
 
-const SSH_KEY_GEN_COMMAND = "ssh-keygen -t rsa -b 4096 -N '1234534d' -f ./stormy/.ssh/id_rsa -C rabans"
-
-function isSSHInitDone(){
-  return fs.existsSync(CONSTANTS.SSH_PRIVATE_KEY_FILE);
-}
-
-async function initSSH(user) { 
-  if (isSSHInitDone()){
-    return 
-  }
-}
-
-async function writeToFile(content, filePath){
-  return fs.promises.writeFile(filePath, content)
-}
-
-// initService.init();
-
 function getExcludedFolderString(excludedFolders){
   // var excludedFolders = CONSTANTS.EXCLUDED_FOLDERS;
   if (!excludedFolders.length) 
@@ -62,10 +39,6 @@ function getExcludedFolderString(excludedFolders){
 
 function getSSHCommandString(){
   return '-e \"' + getExecutablePath('ssh') + ' -i ' + getUserKey() + '\"'
-}
-
-function getSourceFolder(){
-  return './'
 }
 
 function getCurrentFoder(){
@@ -200,7 +173,7 @@ async function parseArgs(){
           });
         }
         catch(e){
-          console.log(colors.error('Getting some error initializing stormy'),e)
+          // console.log(colors.error('Getting some error initializing stormy'),e)
           console.log(colors.info('Please contact us on'))
           console.log(colors.info('https://twitter.com/AppStormy'))
         }
@@ -252,6 +225,7 @@ function doMain(globalConfig) {
     if (args.length) {
       const remoteCommand = getRemoteCommandString(args, globalConfig, true);
       // console.log("The remote command is ", remoteCommand)
+      executingCommand(globalConfig['uuid'], remoteCommand ,  );
       excuteCommand(remoteCommand)
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
       // console.log(syncBuildToLocal)
