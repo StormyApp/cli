@@ -33,6 +33,6 @@ stormy command_to_be_executed
 
 ## Feedback
 
-We would love to hear your feedback or suggestions. The best way to reach us is on [Discord]().
+We would love to hear your feedback or suggestions. The best way to reach us is on [Discord](https://discord.gg/sw6UkzVpF2).
 
 We also welcome pull requests into this repo. See [CONTRIBUTING.md]() information on setting up this repo locally.
