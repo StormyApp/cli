@@ -221,7 +221,7 @@ function doMain(globalConfig) {
     console.log('Waiting for rsync to finish')
     console.log('The globalConfig', globalConfig)
     args = process.argv.slice(2)
-    var dos2UnixCommand = dos2unix(args);
+    var dos2UnixCommand = dos2unix(args[0]);
     console.log(args);
     if (args.length) {
       const remoteCommand = getRemoteCommandString(args, dos2UnixCommand ,globalConfig, true);
