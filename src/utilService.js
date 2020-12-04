@@ -39,12 +39,30 @@ function createDir(targetDir) {
     }
 }
 
+function isWindows(){
+  if (process.platform === 'win32')
+    return true;
+  return false;
+}
+
+function isShellScript(filePath){
+  let result = fs.existsSync(filePath);
+  if (!result)
+    return false
+  if (filePath.endsWith('.sh')){
+    return true
+  } 
+  return false
+}
+
 module.exports = {
     executeCommandPromise,
     createDir,
     logSuccess,
     logError,
-    logInput
+    logInput,
+    isShellScript,
+    isWindows
 }
 
   

@@ -67,19 +67,19 @@ function generateRsyncCommandString(sourceDir, destDir){
 }
 
 
-function getCommandUtil(remoteCommand){
+function getCommandUtil(commandPrefix ,remoteCommand){
   // return 
   // " \" mkdir "+ getCurrentFoder()+";+ 
-  return "\"" + "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') + "\"" 
+  return "\"" + "cd ~/" + getCurrentFoder() + " ; "+ commandPrefix + ';' + remoteCommand.join(' ') + "\"" 
 }
 
-function getRemoteCommandString(remoteCommand, globalConfig, getTerminal){
+function getRemoteCommandString(remoteCommand, commandPrefix, globalConfig, getTerminal){
   var uuid = globalConfig.uuid;
   var command = getExecutablePath('ssh') ; 
   if ( getTerminal) {
     // command = command + ' -T '
   }
-  command = command +' -i ' + getUserKey()+ ' ' +  uuid + '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(remoteCommand)
+  command = command +' -i ' + getUserKey()+ ' ' +  uuid + '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(commandPrefix, remoteCommand)
   return command;
 }
 
@@ -221,10 +221,11 @@ function doMain(globalConfig) {
     console.log('Waiting for rsync to finish')
     console.log('The globalConfig', globalConfig)
     args = process.argv.slice(2)
+    var dos2UnixCommand = dos2unix(args);
     console.log(args);
     if (args.length) {
-      const remoteCommand = getRemoteCommandString(args, globalConfig, true);
-      // console.log("The remote command is ", remoteCommand)
+      const remoteCommand = getRemoteCommandString(args, dos2UnixCommand ,globalConfig, true);
+      console.log("The remote command is ", remoteCommand)
       executingCommand(globalConfig['uuid'], remoteCommand,  '')
       excuteCommand(remoteCommand)
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
@@ -237,3 +238,11 @@ function doMain(globalConfig) {
   })
 }
 
+
+function dos2unix(filePath){
+  if (!utilService.isWindows())
+    return
+  if (!utilService.isShellScript(filePath))
+    return
+  return 'dos2unix '  + filePath
+}

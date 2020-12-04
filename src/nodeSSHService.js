@@ -21,27 +21,3 @@ async function portForward(username,localPort, remotePort) {
 module.exports = {
   portForward
 }
-
-// nodeSetup()
-
-// var sshconfig = {
-//   host: CONSTANTS.RSYNC.IP,
-//   username: 'alxyfhehxtnwdl91z4omkg29to6zl8i',
-//   identity: CONSTANTS.SSH_PRIVATE_KEY_FILE
-// }
-
-// console.log('Using the new authentication methd')
-// var ssh = new SSH2Promise(sshconfig);
-// ssh.connect().then(() => {
-//   console.log("Connection established") 
-// });
-
-// ssh.shell().then((socket) => {
-//   socket.on('data', (data) => {
-//     //shell content will be available here
-//     console.log(data)
-//   })
-//   //Can write to socket 
-//   socket.write("")
-// });
- 
