@@ -228,7 +228,7 @@ function doMain(globalConfig) {
       const remoteCommand = getRemoteCommandString(args, dos2UnixCommand ,globalConfig, true);
       console.log("The remote command is ", remoteCommand)
       executingCommand(globalConfig['uuid'], remoteCommand,  '')
-      executeRemote(remoteCommand)
+      executeRemote(remoteCommand, globalConfig['uuid'])
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
       // console.log(syncBuildToLocal)
       // excuteCommand(syncBuildToLocal)
