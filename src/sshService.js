@@ -33,14 +33,16 @@ const getSSHGenCommand = () => {
     return command;
 }
 
-const getKeyPath = () => {
-
+const getSSHConnectionObj = (username) => {
+    return {
+        host: CONSTANTS.RSYNC.IP,
+        username: username,
+        privateKey: readPublicKey(),
+    }
 }
-
-// const 
-
 
 module.exports = {
     sshKeyGen,
-    readPublicKey
+    readPublicKey,
+    getSSHConnectionObj
 }

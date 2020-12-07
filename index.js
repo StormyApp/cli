@@ -9,6 +9,7 @@ var utilService = require('./src/utilService');
 var sshService = require('./src/sshService')
 var colors = require('colors');
 var nodeSSHService = require('./src/nodeSSHService');
+const { executeRemote } = require('./src/ssh2');
  
 colors.setTheme({
   silly: 'rainbow',
@@ -86,7 +87,7 @@ function getRemoteCommandString(remoteCommand, commandPrefix, globalConfig, getT
 function getExecutablePath(name){
   if(process.platform != 'win32'){
     // set the permission to the key as chmod 400 
-    excuteCommand('chmod 400 '+ getUserKey())
+    // excuteCommand('chmod 400 '+ getUserKey())
     return name;
   }
   switch(name){
@@ -227,7 +228,7 @@ function doMain(globalConfig) {
       const remoteCommand = getRemoteCommandString(args, dos2UnixCommand ,globalConfig, true);
       console.log("The remote command is ", remoteCommand)
       executingCommand(globalConfig['uuid'], remoteCommand,  '')
-      excuteCommand(remoteCommand)
+      executeRemote(remoteCommand)
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
       // console.log(syncBuildToLocal)
       // excuteCommand(syncBuildToLocal)
