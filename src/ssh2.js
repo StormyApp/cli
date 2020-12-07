@@ -25,7 +25,6 @@ const executeRemote = (cmd, uuid, outputCb) => {
         }
 
         stream.on('close', (code, signal) => {
-
           if (code === 0){
             resolve(code)
           } else {
@@ -34,12 +33,12 @@ const executeRemote = (cmd, uuid, outputCb) => {
           conn.end();
           process.stdin.removeListener("data", stdinListener)
           return;
-          // console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
         })
-
+        
+        let skipNext = false;
         stream.stdout.on('data', (data) => {
           if (skipNext) { return skipNext = false; }
-          console.log(''+data);
+          process.stdout.write(data);
         })
 
         // Possibility to add different colors plus linking to google search

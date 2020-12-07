@@ -16,6 +16,8 @@ async function portForward(username,localPort, remotePort) {
     toPort: remotePort,
     toHost: CONSTANTS.RSYNC.IP
   })
+
+  return sshConnection;
 }
 
 module.exports = {

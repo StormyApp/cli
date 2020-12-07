@@ -10,6 +10,7 @@ var sshService = require('./src/sshService')
 var colors = require('colors');
 var nodeSSHService = require('./src/nodeSSHService');
 const { executeRemote } = require('./src/ssh2');
+const { exit } = require('process');
  
 colors.setTheme({
   silly: 'rainbow',
@@ -69,9 +70,9 @@ function generateRsyncCommandString(sourceDir, destDir){
 
 
 function getCommandUtil(commandPrefix ,remoteCommand){
-  // return 
-  // " \" mkdir "+ getCurrentFoder()+";+ 
-  return "\"" + "cd ~/" + getCurrentFoder() + " ; "+ commandPrefix + ';' + remoteCommand.join(' ') + "\"" 
+  if (commandPrefix)
+    return "cd ~/" + getCurrentFoder() + " ; "+ commandPrefix + ';' + remoteCommand.join(' ')
+  return "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') 
 }
 
 function getRemoteCommandString(remoteCommand, commandPrefix, globalConfig, getTerminal){
@@ -214,7 +215,6 @@ const getEmail = () => {
 parseArgs();
 
 function doMain(globalConfig) {
-  nodeSSHService.portForward(globalConfig['uuid'], globalConfig['port'], globalConfig['port']);
   var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
   console.log("The Rsync string is",str)
   var rsyncPromise = utilService.executeCommandPromise(str);
@@ -225,10 +225,16 @@ function doMain(globalConfig) {
     var dos2UnixCommand = dos2unix(args[0]);
     console.log(args);
     if (args.length) {
-      const remoteCommand = getRemoteCommandString(args, dos2UnixCommand ,globalConfig, true);
-      console.log("The remote command is ", remoteCommand)
-      executingCommand(globalConfig['uuid'], remoteCommand,  '')
-      executeRemote(remoteCommand, globalConfig['uuid'])
+      const portForwardConnection = nodeSSHService.portForward(globalConfig['uuid'], globalConfig['port'], globalConfig['port']);
+      executingCommand(globalConfig['uuid'], args,  '')
+      executeRemote(
+        getCommandUtil(undefined, args)
+        , globalConfig['uuid'])
+      .then( () => { console.log('Pass'); })
+      .catch( (e) => { console.log('Fail',e)})
+      .finally( () => {
+        exit(0);
+      })
       // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
       // console.log(syncBuildToLocal)
       // excuteCommand(syncBuildToLocal)

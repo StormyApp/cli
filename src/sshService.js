@@ -36,8 +36,9 @@ const getSSHGenCommand = () => {
 const getSSHConnectionObj = (username) => {
     return {
         host: CONSTANTS.RSYNC.IP,
+        port:22,
         username: username,
-        privateKey: readPublicKey(),
+        privateKey: fs.readFileSync(CONSTANTS.SSH_PRIVATE_KEY_FILE),
     }
 }
 
