@@ -9,7 +9,7 @@ function executeCommandPromise(command){
              console.log('There is an error executing the command', error)
             reject(error)  
           } else {
-              console.log("There is no errror", stdout)
+              // console.log("There is no errror", stdout)
               resolve(stdout? stdout : stderr);
           }
       });

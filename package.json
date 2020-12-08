@@ -1,6 +1,6 @@
 {
   "name": "stormy_build",
-  "version": "1.2.2",
+  "version": "1.2.4",
   "description": "CLI tool for Stormy Build",
   "main": "./index.js",
   "bin": {
@@ -19,7 +19,8 @@
     "axios": "^0.21.0",
     "colors": "^1.4.0",
     "dotenv": "^8.2.0",
-    "node-ssh-forward": "^0.7.2"
+    "node-ssh-forward": "^0.7.2",
+    "ssh2": "^0.8.9"
   },
   "preferGlobal": true,
   "devDependencies": {}

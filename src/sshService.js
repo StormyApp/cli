@@ -23,8 +23,7 @@ const readPublicKey = () => {
 const getSSHGenCommand = () => {
     let command = 'ssh-keygen -t rsa -f ' + CONSTANTS.SSH_PRIVATE_KEY_FILE + ' -q '
     if (process.platform == 'win32'){
-        console.log('We are going to generate SSH Keys for you.')
-        console.log('Please choose the default options.')
+        console.log('Please press Enter for default passphrase.')
         // Put the command for the windows
         // command = ''
     } else {
