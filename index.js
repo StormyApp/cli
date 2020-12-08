@@ -152,7 +152,7 @@ async function parseArgs(){
       break;
     case 'init':
       // make a rquest to server
-      // console.log('Inside the init')
+      console.log('Setting up your High Speed Environment ...')
       var uuid =  await initService.getUUID()
       if ( globalConfig && !globalConfig['userCreated']){
         try {
