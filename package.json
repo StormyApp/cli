@@ -1,6 +1,6 @@
 {
   "name": "stormy_build",
-  "version": "1.2.4",
+  "version": "1.2.6",
   "description": "CLI tool for Stormy Build",
   "main": "./index.js",
   "bin": {
