@@ -1,4 +1,5 @@
 var CONSTANTS = require('./const');
+const { readConfigJson } = require('./initService');
 var utilService = require('./utilService')
 
 const sshKeyGen = async () => {
@@ -38,6 +39,16 @@ const getSSHConnectionObj = (username) => {
         port:22,
         username: username,
         privateKey: fs.readFileSync(CONSTANTS.SSH_PRIVATE_KEY_FILE),
+    }
+}
+
+const getUserProvidedSSHConfig = async () => {
+    const sshConfig = await readConfigJson(CONSTANTS.SSH_CONFIG)
+    return {
+        host: sshConfig.host,
+        port: 22,
+        username: sshConfig.username,
+        privateKey: sshConfig.privateKey
     }
 }
 

@@ -75,14 +75,14 @@ const getGlobalConfig = () => {
 function readConfigJson(configLocation){
     let result = fs.existsSync(configLocation);
     if (!result)
-        return '{}'
+        return {}
     return new Promise((resolve, reject) => {
         fs.readFile(configLocation, 'utf8', (err, data) => {
             if(err){
-                reject(err);
+                reject({});
             }
             else {
-                resolve(data);
+                resolve(JSON.parse(data));
             }
         })
     })
@@ -92,10 +92,7 @@ async function init(){
     try {
         var initFile = CONSTANTS.CONFIG_FILE;
         createDir(CONSTANTS.BASE_FOLDER);
-        globalConfigFile = await readConfigJson(initFile);
-        if (globalConfigFile !== "")
-            globalConfig = JSON.parse(globalConfigFile)
-        // console.log('The value of the globalConfig value', globalConfig)
+        globalConfig = await readConfigJson(initFile);
         return globalConfig;
     } catch(e){
       console.log("Error initiating the build", e)
