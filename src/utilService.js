@@ -4,7 +4,7 @@ const colors = require('colors');
 function executeCommandPromise(command){
     // console.log('In the Promise Function of execute Command', command)
     return new Promise((resolve, reject) => {
-      exec(command, (error, stdout, stderr) => {
+      exec(command,{maxBuffer: 1024 * 500} ,(error, stdout, stderr) => {
          if (error) {
              console.log('There is an error executing the command', error)
             reject(error)  
