@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 var exec = require('child_process').exec;
+const { isUserCreated, isInitDone, setUserCreated, setDefaultPort, globalConfig, getUUID } = require('./src/initService');
+
 require('dotenv').config({path: __dirname +'/' + 'local.env'});
-var CONSTANTS = require('./src/const');
+const CONSTANTS = require('./src/const');
 const { registerCLI,executingCommand } = require("./src/httpClient");
-var initService = require('./src/initService');
-var globalConfig = {}
-var utilService = require('./src/utilService');
-var sshService = require('./src/sshService')
-var colors = require('colors');
-var nodeSSHService = require('./src/nodeSSHService');
+const utilService = require('./src/utilService');
+const sshService = require('./src/sshService')
+const colors = require('colors');
+const nodeSSHService = require('./src/nodeSSHService');
 const { executeRemote } = require('./src/ssh2');
 const { exit } = require('process');
- 
+const { generateRsyncCommandString } = require("./src/rsyncService");
+const { getWorkingDirectory } = require('./src/utilService');
+const { pathToRemoteFolder } = require('./src/sshService');
+// console.log('After the require index') 
 colors.setTheme({
   silly: 'rainbow',
   input: 'grey',
@@ -26,53 +29,10 @@ colors.setTheme({
   success: 'pink',
 });
 
-function getExcludedFolderString(excludedFolders){
-  // var excludedFolders = CONSTANTS.EXCLUDED_FOLDERS;
-  if (!excludedFolders.length) 
-    return ''
-  cmd_line = ""
-  // = '--exclude {'
-  for (const folder of excludedFolders){
-    cmd_line = cmd_line + " --exclude " +  folder + CONSTANTS.RSYNC.SPACE
-  }
-  // cmd_line = cmd_line + "''}"
-  return cmd_line
-}
-
-function getSSHCommandString(){
-  return '-e \"' + getExecutablePath('ssh') + ' -i ' + getUserKey() + '\"'
-}
-
-function getCurrentFoder(){
-  let splitter = '\\';
-  if(process.platform != 'win32'){
-    splitter = '/'
-  }
-  var dir =  process.cwd().split(splitter);
-  return  dir[dir.length - 1];
-}
-
-function pathToRemoteFolder(folderName){
-  return globalConfig['uuid'] + '@' + CONSTANTS.RSYNC.IP + ":~/" + folderName 
-}
-
-function generateRsyncCommandString(sourceDir, destDir){
-  return getExecutablePath (CONSTANTS.RSYNC.NAME) + 
-  //  CONSTANTS.RSYNC.SPACE  + CONSTANTS.RSYNC.SKIP_TIME 
-  CONSTANTS.RSYNC.SPACE 
-   + CONSTANTS.RSYNC.SPACE +
-  CONSTANTS.RSYNC.ARGS + CONSTANTS.RSYNC.SPACE  +
-  getExcludedFolderString(CONSTANTS.RSYNC.EXCLUDED_FOLDERS) + CONSTANTS.RSYNC.SPACE  +
-  getSSHCommandString() + CONSTANTS.RSYNC.SPACE +
-  sourceDir + CONSTANTS.RSYNC.SPACE  +
-  destDir
-}
-
-
 function getCommandUtil(commandPrefix ,remoteCommand){
   if (commandPrefix)
-    return "cd ~/" + getCurrentFoder() + " ; "+ commandPrefix + ';' + remoteCommand.join(' ')
-  return "cd ~/" + getCurrentFoder() + " ; " + remoteCommand.join(' ') 
+    return "cd ~/" + getWorkingDirectory() + " ; "+ commandPrefix + ';' + remoteCommand.join(' ')
+  return "cd ~/" + getWorkingDirectory() + " ; " + remoteCommand.join(' ') 
 }
 
 function getRemoteCommandString(remoteCommand, commandPrefix, globalConfig, getTerminal){
@@ -81,30 +41,8 @@ function getRemoteCommandString(remoteCommand, commandPrefix, globalConfig, getT
   if ( getTerminal) {
     // command = command + ' -T '
   }
-  command = command +' -i ' + getUserKey()+ ' ' +  uuid + '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(commandPrefix, remoteCommand)
+  command = command +' -i ' + sshService.getUserKey()+ ' ' +  uuid + '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(commandPrefix, remoteCommand)
   return command;
-}
-
-function getExecutablePath(name){
-  if(process.platform != 'win32'){
-    // set the permission to the key as chmod 400 
-    // excuteCommand('chmod 400 '+ getUserKey())
-    return name;
-  }
-  switch(name){
-    case 'ssh':
-      return __dirname + '/DeltaCopy/ssh'
-    case 'rsync':
-      return __dirname + '/DeltaCopy/rsync'
-  }
-}
-
-function getUserKey(uid){
-  const key =  process.cwd() + '/'+ CONSTANTS.SSH_PRIVATE_KEY_FILE
-  // Path to the global private key file
-  // __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
-  // console.log("Trying to fetch the user key", key)
-  return key
 }
 
 async function excuteCommand(command){
@@ -126,20 +64,8 @@ async function excuteCommand(command){
   executor.stdin.pipe(process.stdin);
 }
 
-async function init(){
-  globalConfig = await initService.init()
-  if ( globalConfig && !globalConfig['keyCreated']){
-    await sshService.sshKeyGen()
-    globalConfig['keyCreated'] = true
-    
-  }
-  return globalConfig
-}
-
 async function parseArgs(){
-  globalConfig = await init()
   var args = process.argv.slice(2);
-  // console.log(args[0])
   switch(args[0]){
     case 'login':
       console.log("Inside the login Method")
@@ -153,79 +79,61 @@ async function parseArgs(){
     case 'init':
       // make a rquest to server
       console.log('Setting up your High Speed Environment ...')
-      var uuid =  await initService.getUUID()
-      if ( globalConfig && !globalConfig['userCreated']){
+      if (!isUserCreated()){
         try {
           const readline = require('readline').createInterface({
             input: process.stdin,
             output: process.stdout
           });
+          var uuid =  await getUUID()
           var result = await registerCLI(uuid, sshService.readPublicKey());
-          globalConfig['guuid'] = result.data['guuid']
-          globalConfig['userCreated'] = true
+          // setUserGUUID(resul.data['guuid'])
+          setUserCreated(true)
           console.log(colors.info('....... INIT Done Successfully .........'))
           readline.question('What is the default port to run your application?', port => {
             console.log(`You have chosen the default port: ${port}`);
-            globalConfig['port'] = port
+            setDefaultPort(port);
             console.log(colors.info('If you want to change it in future go to your config file'))
             console.log(colors.info(CONSTANTS.CONFIG_FILE))
             readline.close();
-            initService.writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
             // console.log(colors.info('Your configuration file is located in', CONSTANTS.CONFIG_FILE))
           });
         }
         catch(e){
           // console.log(colors.error('Getting some error initializing stormy'),e)
+          setUserCreated(false)
           console.log(colors.info('Please contact us on'))
           console.log(colors.info('https://twitter.com/AppStormy'))
         }
       } else {
         console.log(colors.info('....... You have already completed INIT .........'))
       }
-      initService.writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig))
       break;
     default:
-      if ( !isInitComplete(globalConfig) )
+      if ( !isInitDone() )
         console.log('Please run the init method')
       else {
-        // console.log('Inside the doMain ')
-        doMain(globalConfig);
+        // doMain();
       }
   }
 }
+globalConfig.then( () => parseArgs())
+// parseArgs();
 
-const isInitComplete = (globalConfig) => {
-  // console.log('The values of the globalConfig values are', globalConfig)
-  if ( !globalConfig )
-    return false
-  if ( !globalConfig['uuid'])
-    return false
-  if (!globalConfig['keyCreated'])
-    return false
-  if (!globalConfig['guuid']){
-    return false
-  }
-  return true
-}
-
-const getEmail = () => {
-  console.log('Please enter your email to continue')
-}
-
-parseArgs();
-
-function doMain(globalConfig) {
-  var str = generateRsyncCommandString('./', pathToRemoteFolder(getCurrentFoder()))
+const doMain = async() => {
+  const remoteFolder = await pathToRemoteFolder(globalConfig['uuid'], getWorkingDirectory())
+  var str = generateRsyncCommandString('./', remoteFolder)
   console.log("The Rsync string is",str)
   var rsyncPromise = utilService.executeCommandPromise(str);
     rsyncPromise.then(() => {
     console.log('Waiting for rsync to finish')
     console.log('The globalConfig', globalConfig)
     args = process.argv.slice(2)
-    var dos2UnixCommand = dos2unix(args[0]);
+    // var dos2UnixCommand = dos2unix(args[0]);
     console.log(args);
     if (args.length) {
       const portForwardConnection = nodeSSHService.portForward(globalConfig['uuid'], globalConfig['port'], globalConfig['port']);
+      startChokidarProcess();
       executingCommand(globalConfig['uuid'], args,  '')
       executeRemote(
         getCommandUtil(undefined, args)
@@ -235,9 +143,6 @@ function doMain(globalConfig) {
       .finally( () => {
         exit(0);
       })
-      // var syncBuildToLocal = generateRsyncCommandString(pathToRemoteFolder(getCurrentFoder()+'/build'), getSourceFolder());
-      // console.log(syncBuildToLocal)
-      // excuteCommand(syncBuildToLocal)
     }
 
   }).catch( (error) => {
@@ -245,11 +150,27 @@ function doMain(globalConfig) {
   })
 }
 
+process.on('SIGINT', function() {
+    console.log("Caught interrupt signal");
+    process.exit();
+});
 
-function dos2unix(filePath){
-  if (!utilService.isWindows())
-    return
-  if (!utilService.isShellScript(filePath))
-    return
-  return 'dos2unix '  + filePath
+process.on('SIGHUP', function (){
+  console.log('Exiting the terminal')
+  process.exit();
+})
+
+process.on('SIGABRT', function(){
+  console.log('SIGABRT ...')
+  process.exit()
+})
+
+const startChokidarProcess = () => {
+  console.log('Starting the Chokidar Process')
+  const { fork } = require("child_process");
+  var childProcess = fork(require.resolve("./src/chokidarService"));
+  childProcess.on('close', () => {
+    process.exit()
+  })
 }
+// startChokidarProcess()

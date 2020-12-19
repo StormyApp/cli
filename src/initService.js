@@ -1,7 +1,9 @@
 const { resolveCname } = require('dns');
-const { write } = require('fs');
+const { write, stat } = require('fs');
 const { globalAgent } = require('http');
 const { config } = require('process');
+const { sshKeyGen } = require('./sshService')
+const {readConfigJson} = require('./utilService')
 fs = require('fs')
 CONSTANTS = require('./const')
 
@@ -72,22 +74,6 @@ const getGlobalConfig = () => {
     // Read the value from the user
 }
 
-function readConfigJson(configLocation){
-    let result = fs.existsSync(configLocation);
-    if (!result)
-        return {}
-    return new Promise((resolve, reject) => {
-        fs.readFile(configLocation, 'utf8', (err, data) => {
-            if(err){
-                reject({});
-            }
-            else {
-                resolve(JSON.parse(data));
-            }
-        })
-    })
-}
-
 async function init(){
     try {
         var initFile = CONSTANTS.CONFIG_FILE;
@@ -101,6 +87,55 @@ async function init(){
     }
 }
 
+const isUserCreated = () => {
+    return globalConfig && globalConfig['userCreated'];
+}
+
+const setUserCreated = (status) => {
+    set('userCreated', status)
+}
+
+const setDefaultPort = (port) => {
+    set("port", port)
+}
+
+const set = (key, value) => {
+    if (globalConfig){
+        globalConfig[key] = value
+        writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig, null, '\t')).then( (result) => {
+            console.info('Global configuration Updated', globalConfig);
+        }).catch( (err) => {
+            console.error('Error updating Global configuration', err)
+        })
+    }
+}
+
+const isInitDone = () => {
+    // console.log("The globalConfig is", globalConfig)
+    if ( !globalConfig )
+      return false
+    if ( !globalConfig['uuid'])
+      return false
+    if (!globalConfig['keyCreated'])
+      return false
+    if (!globalConfig['guuid']){
+      return false
+    }
+    return true
+}
+
+const run = async () => {
+    globalConfig = await init()
+    // console.log('Read the globalConfig value in the run method', globalConfig)
+    if ( globalConfig && !globalConfig['keyCreated']){
+      await sshKeyGen()
+      globalConfig['keyCreated'] = true
+    }
+    return globalConfig
+}
+
+globalConfig = run();
+
 module.exports = {
     readConfigJson,
     createDir,
@@ -108,5 +143,9 @@ module.exports = {
     writeConfigJson,
     getUUID,
     globalConfig,
-    addKey
+    addKey,
+    isUserCreated,
+    isInitDone,
+    setUserCreated,
+    setDefaultPort
 }

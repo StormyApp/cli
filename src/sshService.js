@@ -1,15 +1,14 @@
 var CONSTANTS = require('./const');
-const { readConfigJson } = require('./initService');
-var utilService = require('./utilService')
+var {readConfigJson, createDir, executeCommandPromise} = require('./utilService')
 
 const sshKeyGen = async () => {
     if (isKeyPresent()){
         return
     } else {
-        utilService.createDir(CONSTANTS.BASE_FOLDER + '/.ssh')
+        createDir(CONSTANTS.BASE_FOLDER + '/.ssh')
     }
     let command = getSSHGenCommand();
-    return utilService.executeCommandPromise(command);
+    return executeCommandPromise(command);
 }
 
 const isKeyPresent = () => {
@@ -52,8 +51,23 @@ const getUserProvidedSSHConfig = async () => {
     }
 }
 
+const  getUserKey =(uid) => {
+    const key =  process.cwd() + '/'+ CONSTANTS.SSH_PRIVATE_KEY_FILE
+    // Path to the global private key file
+    // __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
+    // console.log("Trying to fetch the user key", key)
+    return key
+}
+
+const pathToRemoteFolder =  (uuid, folderName) => {
+    // const config = await globalConfig;
+    return uuid + '@' + CONSTANTS.RSYNC.IP + ":~/" + folderName 
+}
+
 module.exports = {
     sshKeyGen,
     readPublicKey,
-    getSSHConnectionObj
+    getSSHConnectionObj,
+    getUserKey,
+    pathToRemoteFolder
 }

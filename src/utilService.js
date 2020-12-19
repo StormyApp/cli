@@ -16,6 +16,22 @@ function executeCommandPromise(command){
     });
 }
 
+function readConfigJson(configLocation){
+  let result = fs.existsSync(configLocation);
+  if (!result)
+      return {}
+  return new Promise((resolve, reject) => {
+      fs.readFile(configLocation, 'utf8', (err, data) => {
+          if(err){
+              reject({});
+          }
+          else {
+              resolve(JSON.parse(data));
+          }
+      })
+  })
+}
+
 function logError(message) {
   // console.log(colors.red(message))
 }
@@ -55,6 +71,23 @@ function isShellScript(filePath){
   return false
 }
 
+function getWorkingDirectory(){
+  let splitter = '\\';
+  if(process.platform != 'win32'){
+    splitter = '/'
+  }
+  var dir =  process.cwd().split(splitter);
+  return  dir[dir.length - 1];
+}
+
+function dos2unix(filePath){
+  if (!isWindows())
+    return
+  if (!isShellScript(filePath))
+    return
+  return 'dos2unix '  + filePath
+}
+
 module.exports = {
     executeCommandPromise,
     createDir,
@@ -62,7 +95,10 @@ module.exports = {
     logError,
     logInput,
     isShellScript,
-    isWindows
+    isWindows,
+    getWorkingDirectory,
+    dos2unix,
+    readConfigJson
 }
 
   
