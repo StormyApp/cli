@@ -103,7 +103,7 @@ const set = (key, value) => {
     if (globalConfig){
         globalConfig[key] = value
         writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig, null, '\t')).then( (result) => {
-            console.info('Global configuration Updated', globalConfig);
+            // console.info('Global configuration Updated', globalConfig);
         }).catch( (err) => {
             console.error('Error updating Global configuration', err)
         })
@@ -118,9 +118,8 @@ const isInitDone = () => {
       return false
     if (!globalConfig['keyCreated'])
       return false
-    if (!globalConfig['guuid']){
-      return false
-    }
+    // if (!globalConfig['guuid']){
+    //   return false
     return true
 }
 

@@ -9,16 +9,16 @@ function getExecutablePath(name){
   }
   switch(name){
     case 'ssh':
-      return __dirname + '/../DeltaCopy/ssh'
+      return __dirname + '/DeltaCopy/ssh'
     case 'rsync':
-      return __dirname + '/../DeltaCopy/rsync'
+      return __dirname + '/DeltaCopy/rsync'
     default:
       return name;
   }
 }
 
 function getSSHCommandString(){
-  return '-e \"' + getExecutablePath('ssh') + ' -i ' + getUserKey() + '\"'
+  return '-e \"' + getExecutablePath('ssh') + ' -v -i ' + getUserKey() + '\"'
 }
 
 function getExcludedFolderString(excludedFolders){
