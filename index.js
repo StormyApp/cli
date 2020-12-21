@@ -35,35 +35,6 @@ function getCommandUtil(commandPrefix ,remoteCommand){
   return "cd ~/" + getWorkingDirectory() + " ; " + remoteCommand.join(' ') 
 }
 
-function getRemoteCommandString(remoteCommand, commandPrefix, globalConfig, getTerminal){
-  var uuid = globalConfig.uuid;
-  var command = getExecutablePath('ssh') ; 
-  if ( getTerminal) {
-    // command = command + ' -T '
-  }
-  command = command +' -i ' + sshService.getUserKey()+ ' ' +  uuid + '@' + CONSTANTS.RSYNC.IP + ' ' + getCommandUtil(commandPrefix, remoteCommand)
-  return command;
-}
-
-async function excuteCommand(command){
-  // console.log(command)
-  var executor = exec(command);
-
-  // executor.stdout.on('data', function(data){
-  //   // var p = data.replace('localhost', CONSTANTS.RSYNC.IP)
-  //   process.stdout.write(p)
-  // })
-  // executor.stderr.on('data', function(data){
-  //   const terminalLink = require('terminal-link');
-  //   const link = terminalLink(data, 'https://www.google.com/search?q='+data);
-  //   process.stderr.write(link)
-  //   // console.log(link);
-  // })
-  executor.stdout.pipe(process.stdout);
-  executor.stderr.pipe(process.stderr);
-  executor.stdin.pipe(process.stdin);
-}
-
 async function parseArgs(){
   var args = process.argv.slice(2);
   switch(args[0]){
