@@ -22,10 +22,17 @@ process.on('SIGINT', function() {
   }
 );
 
+const getThePath = (filePath)  => {
+    const path = require('path')
+    const p = path.join('.' + filePath)
+    console.log('The Path is ',p)
+ }
+
 const syncLocalChange = async (filePath) => {
     console.log('Syncing the change')
-    const uuid = await globalConfig['uuid'] 
+    const {uuid} = await globalConfig
     const remoteFolder = pathToRemoteFolder(uuid, getWorkingDirectory())
+    getThePath(filePath);
     var rsyncString = generateRsyncCommandString('./' + filePath, remoteFolder)
     console.log(rsyncString)
     executeCommandPromise(rsyncString).then(() => console.log('Rsync Done Second Time'))

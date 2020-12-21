@@ -1,15 +1,24 @@
 var exec = require('child_process').exec;
+const { spawn } = require('child_process');
 const colors = require('colors');
 
 function executeCommandPromise(command){
     // console.log('In the Promise Function of execute Command', command)
     return new Promise((resolve, reject) => {
-      exec(command,{maxBuffer: 1024 * 500} ,(error, stdout, stderr) => {
+      // const commands = command.split()
+      const child = exec(command
+        // ,{ detached: false, shell:true});
+      // process.stdin.pipe(child.stdin)
+      // child.on('message', console.log)
+      // child.on('data', console.log)
+      // child.on('error', reject)
+      // child.on('exit', resolve)
+      ,{maxBuffer: 1024 * 500} ,(error, stdout, stderr) => {
          if (error) {
              console.log('There is an error executing the command', error)
             reject(error)  
           } else {
-              // console.log("There is no errror", stdout)
+              console.log("There is no errror", stdout)
               resolve(stdout? stdout : stderr);
           }
       });

@@ -9,7 +9,7 @@ const utilService = require('./src/utilService');
 const sshService = require('./src/sshService')
 const colors = require('colors');
 const nodeSSHService = require('./src/nodeSSHService');
-const { executeRemote } = require('./src/ssh2');
+const { executeRemote, sshClient } = require('./src/ssh2');
 const { exit } = require('process');
 const { generateRsyncCommandString } = require("./src/rsyncService");
 const { getWorkingDirectory } = require('./src/utilService');
@@ -113,7 +113,7 @@ async function parseArgs(){
       if ( !isInitDone() )
         console.log('Please run the init method')
       else {
-        // doMain();
+        doMain();
       }
   }
 }
@@ -121,7 +121,8 @@ globalConfig.then( () => parseArgs())
 // parseArgs();
 
 const doMain = async() => {
-  const remoteFolder = await pathToRemoteFolder(globalConfig['uuid'], getWorkingDirectory())
+  const {uuid, port} = await globalConfig
+  const remoteFolder = pathToRemoteFolder(uuid, getWorkingDirectory())
   var str = generateRsyncCommandString('./', remoteFolder)
   console.log("The Rsync string is",str)
   var rsyncPromise = utilService.executeCommandPromise(str);
@@ -132,12 +133,12 @@ const doMain = async() => {
     // var dos2UnixCommand = dos2unix(args[0]);
     console.log(args);
     if (args.length) {
-      const portForwardConnection = nodeSSHService.portForward(globalConfig['uuid'], globalConfig['port'], globalConfig['port']);
-      startChokidarProcess();
-      executingCommand(globalConfig['uuid'], args,  '')
+      // const portForwardConnection = nodeSSHService.portForward(uuid, port, port);
+      // startChokidarProcess();
+      executingCommand(uuid , args,  '')
       executeRemote(
         getCommandUtil(undefined, args)
-        , globalConfig['uuid'])
+        , uuid)
       .then( () => { console.log('Pass'); })
       .catch( (e) => { console.log('Fail',e)})
       .finally( () => {
@@ -152,23 +153,26 @@ const doMain = async() => {
 
 process.on('SIGINT', function() {
     console.log("Caught interrupt signal");
+    sshClient.end()
     process.exit();
 });
 
 process.on('SIGHUP', function (){
   console.log('Exiting the terminal')
+  sshClient.end()
   process.exit();
 })
 
 process.on('SIGABRT', function(){
   console.log('SIGABRT ...')
+  sshClient.end()
   process.exit()
 })
 
 const startChokidarProcess = () => {
   console.log('Starting the Chokidar Process')
   const { fork } = require("child_process");
-  var childProcess = fork(require.resolve("./src/chokidarService"));
+  var childProcess = fork(require.resolve("./src/chokidarService"),{detached: false});
   childProcess.on('close', () => {
     process.exit()
   })

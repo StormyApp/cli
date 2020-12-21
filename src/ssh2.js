@@ -5,9 +5,10 @@ const conn = new Client();
 const executeRemote = (cmd, uuid, outputCb) => {
   return new Promise( (resolve, reject) => {
 
-    const conn = new Client();
     conn.on('ready', () => {
-      conn.exec(cmd, { pty: true}, (err, stream) => {
+      conn.exec(cmd, { pty: {
+        modes: 'VINTR'
+      }}, (err, stream) => {
         if (err) throw err;
         
         const stdinListener = (data) => {
@@ -48,5 +49,6 @@ const executeRemote = (cmd, uuid, outputCb) => {
 }
 
 module.exports = {
-  executeRemote
+  executeRemote,
+  sshClient: conn
 }

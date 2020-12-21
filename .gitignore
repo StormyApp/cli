@@ -2,3 +2,6 @@ node_modules
 .stormy
 output
 extra commands.txt
+src/observer.js
+src/obs.js
+openBrowser.js
