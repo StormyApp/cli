@@ -1,5 +1,7 @@
 var CONSTANTS = require('./const');
 var {createDir, executeCommandPromise} = require('./utilService')
+const path = require('path')
+const homedir = require('os')
 const { getDestinationIP, isServerOnPremise } = require('./initService')
 
 const sshKeyGen = async () => {
@@ -45,7 +47,7 @@ const getSSHConnectionObj = async (username) => {
 
 const getUserKey = (uid) => {
     if (isServerOnPremise()){
-        return "~/.ssh/id_rsa"
+        return path.join(homedir.homedir() ,'.ssh','id_rsa')
     }
     return process.cwd() + '/'+ CONSTANTS.SSH_PRIVATE_KEY_FILE
 }
