@@ -1,5 +1,6 @@
 var CONSTANTS = require('./const');
 const {getUserKey} = require('./sshService')
+const path = require('path');
 
 function getExecutablePath(name){
   if(process.platform != 'win32'){
@@ -9,9 +10,9 @@ function getExecutablePath(name){
   }
   switch(name){
     case 'ssh':
-      return __dirname + '/DeltaCopy/ssh'
+      return path.join(__dirname , 'DeltaCopy','ssh')
     case 'rsync':
-      return __dirname + '/DeltaCopy/rsync'
+      return path.join(__dirname , 'DeltaCopy','rsync')
     default:
       return name;
   }
