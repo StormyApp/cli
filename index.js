@@ -36,6 +36,37 @@ function getCommandUtil(commandPrefix ,remoteCommand){
   return "cd ~/" + getWorkingDirectory() + " ; " + remoteCommand.join(' ') 
 }
 
+const doMain = async () => {
+  const {uuid, port} = await globalConfig
+  const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
+  var str = generateRsyncCommandString('./', remoteFolder)
+  console.log("The Rsync string is",str)
+  var rsyncPromise = utilService.executeCommandPromise(str);
+    rsyncPromise.then(() => {
+    console.log('Waiting for rsync to finish')
+    console.log('The globalConfig', globalConfig)
+    args = process.argv.slice(2)
+    // var dos2UnixCommand = dos2unix(args[0]);
+    console.log(args);
+    if (args.length) {
+      const portForwardConnection = nodeSSHService.portForward(uuid, port, port);
+      // startChokidarProcess();
+      executingCommand(uuid , args,  '')
+      executeRemote(
+        getCommandUtil(undefined, args)
+        , uuid)
+      .then( () => { console.log('Pass'); })
+      .catch( (e) => { console.log('Fail',e)})
+      .finally( () => {
+        exit(0);
+      })
+    }
+
+  }).catch( (error) => {
+    console.log('There is an error in executing the rsync command', error)
+  })
+}
+
 async function parseArgs() {
   var args = process.argv.slice(2);
   switch(args[0]){
@@ -90,7 +121,7 @@ async function parseArgs() {
             message: 'What is the username of your account on your build server?'
           })
           // console.log('The username is', username)
-          set('username', username)
+          set('uuid', username)
         } 
 
         var uuid =  await getUUID()
@@ -125,46 +156,14 @@ async function parseArgs() {
 
       break;
     default:
-      if ( !isInitDone() )
+      if ( !isRemoteSetupDone() )
         console.log('Please run the init method')
       else {
         doMain();
       }
   }
 }
-globalConfig.then( () => parseArgs())
-// parseArgs();
-
-const doMain = async() => {
-  const {uuid, port} = await globalConfig
-  const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
-  var str = generateRsyncCommandString('./', remoteFolder)
-  console.log("The Rsync string is",str)
-  var rsyncPromise = utilService.executeCommandPromise(str);
-    rsyncPromise.then(() => {
-    console.log('Waiting for rsync to finish')
-    console.log('The globalConfig', globalConfig)
-    args = process.argv.slice(2)
-    // var dos2UnixCommand = dos2unix(args[0]);
-    console.log(args);
-    if (args.length) {
-      const portForwardConnection = nodeSSHService.portForward(uuid, port, port);
-      // startChokidarProcess();
-      executingCommand(uuid , args,  '')
-      executeRemote(
-        getCommandUtil(undefined, args)
-        , uuid)
-      .then( () => { console.log('Pass'); })
-      .catch( (e) => { console.log('Fail',e)})
-      .finally( () => {
-        exit(0);
-      })
-    }
-
-  }).catch( (error) => {
-    console.log('There is an error in executing the rsync command', error)
-  })
-}
+parseArgs();
 
 process.on('SIGINT', function() {
     console.log("Caught interrupt signal");

@@ -1,6 +1,6 @@
 var CONSTANTS = require('./const');
 var {createDir, executeCommandPromise} = require('./utilService')
-const { getDestinationIP } = require('./initService')
+const { getDestinationIP, isServerOnPremise } = require('./initService')
 
 const sshKeyGen = async () => {
     if (isKeyPresent()){
@@ -13,7 +13,7 @@ const sshKeyGen = async () => {
 }
 
 const isKeyPresent = () => {
-    let result = fs.existsSync(CONSTANTS.SSH_PRIVATE_KEY_FILE);
+    let result = fs.existsSync(getUserKey());
     return result?true:false
 }
 
@@ -22,7 +22,7 @@ const readPublicKey = () => {
 }
 
 const getSSHGenCommand = () => {
-    let command = 'ssh-keygen -t rsa -f ' + CONSTANTS.SSH_PRIVATE_KEY_FILE + ' -q '
+    let command = 'ssh-keygen -t rsa -f ' + getUserKey() + ' -q '
     if (process.platform == 'win32'){
         console.log('Please press Enter for default passphrase.')
         // Put the command for the windows
@@ -39,16 +39,15 @@ const getSSHConnectionObj = async (username) => {
         host: ip,
         port:22,
         username: username,
-        privateKey: fs.readFileSync(CONSTANTS.SSH_PRIVATE_KEY_FILE),
+        privateKey: fs.readFileSync(getUserKey()),
     }
 }
 
-const  getUserKey =(uid) => {
-    const key =  process.cwd() + '/'+ CONSTANTS.SSH_PRIVATE_KEY_FILE
-    // Path to the global private key file
-    // __dirname + CONSTANTS.RSYNC.PATH_TO_KEY
-    // console.log("Trying to fetch the user key", key)
-    return key
+const getUserKey = (uid) => {
+    if (isServerOnPremise()){
+        return "~/.ssh/id_rsa"
+    }
+    return process.cwd() + '/'+ CONSTANTS.SSH_PRIVATE_KEY_FILE
 }
 
 const pathToRemoteFolder = async (uuid, folderName) => {

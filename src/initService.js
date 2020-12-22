@@ -73,6 +73,8 @@ const init = () => {
     }
 }
 
+globalConfig = init();
+
 const isUserCreated = () => {
     return globalConfig && globalConfig['userCreated'];
 }
@@ -81,7 +83,7 @@ const isRemoteSetupDone = () => {
     if (globalConfig['serverSetup'] === 'stormy'){
         return isUserCreated()
     } else {
-        return globalConfig['hostname'] && globalConfig['username']
+        return globalConfig['hostname'] && globalConfig['uuid']
     }
 }
 
@@ -121,7 +123,15 @@ const getDestinationIP = async () =>{
     return globalConfig['hostname'] || CONSTANTS.RSYNC.IP
 }
 
-globalConfig = init();
+const isServerOnPremise = () => {
+    return globalConfig['serverSetup'] === "onPremise"
+}
+
+const getUsername = () => {
+    // if ( isServerOnPremise())
+    //     return globalConfig['username']
+    return globalConfig['uuid']
+}
 
 module.exports = {
     readConfigJson,
@@ -137,5 +147,7 @@ module.exports = {
     setDefaultPort,
     getDestinationIP,
     isRemoteSetupDone,
-    set
+    set,
+    isServerOnPremise,
+    getUsername
 }

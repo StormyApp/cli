@@ -3,9 +3,10 @@ var SSHConnection = require('node-ssh-forward')
 var CONSTANTS = require('./const');
 var fs = require('fs');
 const { getDestinationIP } = require('./initService');
+const { getUserKey } = require('./sshService');
 
 async function portForward(username,localPort, remotePort) {
-  var key = fs.readFileSync(CONSTANTS.SSH_PRIVATE_KEY_FILE).toString()
+  var key = fs.readFileSync(getUserKey()).toString()
   const ip = await getDestinationIP()
   const sshConnection = new SSHConnection.SSHConnection({
       endHost: ip,
