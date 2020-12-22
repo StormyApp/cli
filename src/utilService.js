@@ -29,16 +29,18 @@ function readConfigJson(configLocation){
   let result = fs.existsSync(configLocation);
   if (!result)
       return {}
-  return new Promise((resolve, reject) => {
-      fs.readFile(configLocation, 'utf8', (err, data) => {
-          if(err){
-              reject({});
-          }
-          else {
-              resolve(JSON.parse(data));
-          }
-      })
-  })
+  const configString = fs.readFileSync(configLocation, {encoding: 'utf8', flag: 'r'})
+  return JSON.parse(configString || '{}')
+  // return new Promise((resolve, reject) => {
+  //     fs.readFile(configLocation, 'utf8', (err, data) => {
+  //         if(err){
+  //             reject({});
+  //         }
+  //         else {
+  //             resolve(JSON.parse(data));
+  //         }
+  //     })
+  // })
 }
 
 function logError(message) {
