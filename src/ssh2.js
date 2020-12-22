@@ -2,7 +2,8 @@ const { Client } = require('ssh2');
 const { getSSHConnectionObj } = require('./sshService')
 const conn = new Client();
 
-const executeRemote = (cmd, uuid, outputCb) => {
+const executeRemote = async (cmd, uuid, outputCb) => {
+  const sshConnectionObj = await getSSHConnectionObj(uuid)
   return new Promise( (resolve, reject) => {
 
     conn.on('ready', () => {
@@ -42,9 +43,7 @@ const executeRemote = (cmd, uuid, outputCb) => {
         process.stdin.on('data', stdinListener)
 
       })
-    }).connect(
-      getSSHConnectionObj(uuid)
-      )
+    }).connect(sshConnectionObj)
   });
 }
 

@@ -1,5 +1,6 @@
 var CONSTANTS = require('./const');
-var {readConfigJson, createDir, executeCommandPromise} = require('./utilService')
+var {createDir, executeCommandPromise} = require('./utilService')
+const { getDestinationIP } = require('./initService')
 
 const sshKeyGen = async () => {
     if (isKeyPresent()){
@@ -32,22 +33,13 @@ const getSSHGenCommand = () => {
     return command;
 }
 
-const getSSHConnectionObj = (username) => {
+const getSSHConnectionObj = async (username) => {
+    const ip = await getDestinationIP()
     return {
-        host: CONSTANTS.RSYNC.IP,
+        host: ip,
         port:22,
         username: username,
         privateKey: fs.readFileSync(CONSTANTS.SSH_PRIVATE_KEY_FILE),
-    }
-}
-
-const getUserProvidedSSHConfig = async () => {
-    const sshConfig = await readConfigJson(CONSTANTS.SSH_CONFIG)
-    return {
-        host: sshConfig.host,
-        port: 22,
-        username: sshConfig.username,
-        privateKey: sshConfig.privateKey
     }
 }
 
@@ -59,9 +51,9 @@ const  getUserKey =(uid) => {
     return key
 }
 
-const pathToRemoteFolder =  (uuid, folderName) => {
-    // const config = await globalConfig;
-    return uuid + '@' + CONSTANTS.RSYNC.IP + ":~/" + folderName 
+const pathToRemoteFolder = async (uuid, folderName) => {
+    const ip = await getDestinationIP()
+    return uuid + '@' + ip + ":~/" + folderName 
 }
 
 module.exports = {

@@ -1,8 +1,3 @@
-const { resolveCname } = require('dns');
-const { write, stat } = require('fs');
-const { globalAgent } = require('http');
-const { config } = require('process');
-const { sshKeyGen } = require('./sshService')
 const {readConfigJson} = require('./utilService')
 fs = require('fs')
 CONSTANTS = require('./const')
@@ -48,11 +43,9 @@ function makeid(length) {
     for ( var i = 0; i < length; i++ ) {
        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    return 'a'+result;
+    return 'a' + result;
  }
  
-
-
 async function getUUID() {
     
     if (globalConfig && globalConfig['uuid']){
@@ -67,18 +60,11 @@ async function getUUID() {
     return uud;
 }
 
-const getGlobalConfig = () => {
-    if ( Object.keys(globalConfig).length !== 0){
-        return globalConfig
-    }
-    // Read the value from the user
-}
-
-async function init(){
+const init = () => {
     try {
         var initFile = CONSTANTS.CONFIG_FILE;
         createDir(CONSTANTS.BASE_FOLDER);
-        globalConfig = await readConfigJson(initFile);
+        globalConfig = readConfigJson(initFile);
         return globalConfig;
     } catch(e){
       console.log("Error initiating the build", e)
@@ -89,6 +75,14 @@ async function init(){
 
 const isUserCreated = () => {
     return globalConfig && globalConfig['userCreated'];
+}
+
+const isRemoteSetupDone = () => {
+    if (globalConfig['serverSetup'] === 'stormy'){
+        return isUserCreated()
+    } else {
+        return globalConfig['hostname'] && globalConfig['username']
+    }
 }
 
 const setUserCreated = (status) => {
@@ -123,17 +117,11 @@ const isInitDone = () => {
     return true
 }
 
-const run = async () => {
-    globalConfig = await init()
-    // console.log('Read the globalConfig value in the run method', globalConfig)
-    if ( globalConfig && !globalConfig['keyCreated']){
-      await sshKeyGen()
-      globalConfig['keyCreated'] = true
-    }
-    return globalConfig
+const getDestinationIP = async () =>{
+    return globalConfig['hostname'] || CONSTANTS.RSYNC.IP
 }
 
-globalConfig = run();
+globalConfig = init();
 
 module.exports = {
     readConfigJson,
@@ -146,5 +134,8 @@ module.exports = {
     isUserCreated,
     isInitDone,
     setUserCreated,
-    setDefaultPort
+    setDefaultPort,
+    getDestinationIP,
+    isRemoteSetupDone,
+    set
 }
