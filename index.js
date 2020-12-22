@@ -149,7 +149,7 @@ async function parseArgs() {
           name: 'port',
           message: 'What is the port to run your application?'
         })
-        setDefaultPort(port)
+        setDefaultPort(port || 3000)
 
         console.log(colors.info('If you want to change configurations in future go to your config file'))
         console.log(colors.info(CONSTANTS.CONFIG_FILE))
