@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var exec = require('child_process').exec;
-const { isUserCreated, isInitDone, setUserCreated, setDefaultPort, globalConfig, getUUID } = require('./src/initService');
+const {isRemoteSetupDone, isInitDone, setUserCreated, setDefaultPort, globalConfig, getUUID, set } = require('./src/initService');
 
 require('dotenv').config({path: __dirname +'/' + 'local.env'});
 const CONSTANTS = require('./src/const');
@@ -13,7 +13,7 @@ const { executeRemote, sshClient } = require('./src/ssh2');
 const { exit } = require('process');
 const { generateRsyncCommandString } = require("./src/rsyncService");
 const { getWorkingDirectory } = require('./src/utilService');
-const { pathToRemoteFolder } = require('./src/sshService');
+const { pathToRemoteFolder, sshKeyGen } = require('./src/sshService');
 // console.log('After the require index') 
 colors.setTheme({
   silly: 'rainbow',
@@ -28,6 +28,7 @@ colors.setTheme({
   error: 'red',
   success: 'pink',
 });
+const prompts = require('prompts');
 
 function getCommandUtil(commandPrefix ,remoteCommand){
   if (commandPrefix)
@@ -35,7 +36,7 @@ function getCommandUtil(commandPrefix ,remoteCommand){
   return "cd ~/" + getWorkingDirectory() + " ; " + remoteCommand.join(' ') 
 }
 
-async function parseArgs(){
+async function parseArgs() {
   var args = process.argv.slice(2);
   switch(args[0]){
     case 'login':
@@ -47,38 +48,81 @@ async function parseArgs(){
 
       // Make an API call today to fetch the details from the body
       break;
+
     case 'init':
       // make a rquest to server
       console.log('Setting up your High Speed Environment ...')
-      if (!isUserCreated()){
-        try {
-          const readline = require('readline').createInterface({
-            input: process.stdin,
-            output: process.stdout
-          });
-          var uuid =  await getUUID()
-          var result = await registerCLI(uuid, sshService.readPublicKey());
-          // setUserGUUID(resul.data['guuid'])
-          setUserCreated(true)
-          console.log(colors.info('....... INIT Done Successfully .........'))
-          readline.question('What is the default port to run your application?', port => {
-            console.log(`You have chosen the default port: ${port}`);
-            setDefaultPort(port);
-            console.log(colors.info('If you want to change it in future go to your config file'))
-            console.log(colors.info(CONSTANTS.CONFIG_FILE))
-            readline.close();
-            // console.log(colors.info('Your configuration file is located in', CONSTANTS.CONFIG_FILE))
-          });
-        }
-        catch(e){
-          // console.log(colors.error('Getting some error initializing stormy'),e)
-          setUserCreated(false)
-          console.log(colors.info('Please contact us on'))
-          console.log(colors.info('https://twitter.com/AppStormy'))
-        }
-      } else {
+      if (isRemoteSetupDone()){
         console.log(colors.info('....... You have already completed INIT .........'))
+        break;
       }
+      // 
+        if ( !globalConfig['serverSetup'] ) {
+          const {serverSetup} = await prompts({
+            type: 'select',
+            name: 'serverSetup',
+            message: 'Where to do you want to setup build server?',
+            choices: [
+              { title: 'Stormy Server', description: 'Code will be sent to Stormy Server', value: 'stormy', selected: true},
+              { title: 'On Premise Server', description: 'Code will be sent to your server', value: 'onPremise', selected: false },
+            ],
+            initial: 1
+          });
+          console.log('You have selected configuration to be ', serverSetup)
+          globalConfig['serverSetup'] = serverSetup || "stormy"
+          set('serverSetup', serverSetup || 'stormy')
+        }
+        
+        if ( !globalConfig['hostname'] && globalConfig['serverSetup'] === "onPremise" ){
+          const {hostname} = await prompts({
+            type: 'text',
+            name: 'hostname',
+            message: 'What is the IP address/hostname of your build server?'
+          })
+          // console.log("Your hostnae",hostname)
+          set('hostname',hostname)
+        }
+
+        if( !globalConfig['username'] &&  globalConfig['serverSetup'] === "onPremise"){
+          const {username} = await prompts({
+            type: 'text',
+            name: 'username',
+            message: 'What is the username of your account on your build server?'
+          })
+          // console.log('The username is', username)
+          set('username', username)
+        } 
+
+        var uuid =  await getUUID()
+        if ( globalConfig['serverSetup'] === "stormy"){
+          try {
+            
+            if (!globalConfig['keyCreated']){ 
+              console.log('Generating SSH Keys')
+              await sshKeyGen()
+              set('keyCreated', true)
+              console.log('SSH Keys Generated Successfully')
+            }
+            const result = await registerCLI(uuid, sshService.readPublicKey());
+            setUserCreated(true)
+          } catch (e){
+            setUserCreated(false)
+            console.log(colors.info('Please contact us on'))
+            console.log(colors.info('https://twitter.com/AppStormy'))
+          }
+        }
+
+        console.log(colors.info('....... INIT Done Successfully .........'))
+        const {port} = await prompts({
+          type: 'number',
+          name: 'port',
+          message: 'What is the port to run your application?'
+        })
+        setDefaultPort(port)
+
+        console.log(colors.info('If you want to change configurations in future go to your config file'))
+        console.log(colors.info(CONSTANTS.CONFIG_FILE))
+
       break;
     default:
       if ( !isInitDone() )
@@ -93,7 +137,7 @@ globalConfig.then( () => parseArgs())
 
 const doMain = async() => {
   const {uuid, port} = await globalConfig
-  const remoteFolder = pathToRemoteFolder(uuid, getWorkingDirectory())
+  const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
   var str = generateRsyncCommandString('./', remoteFolder)
   console.log("The Rsync string is",str)
   var rsyncPromise = utilService.executeCommandPromise(str);
@@ -104,7 +148,7 @@ const doMain = async() => {
     // var dos2UnixCommand = dos2unix(args[0]);
     console.log(args);
     if (args.length) {
-      // const portForwardConnection = nodeSSHService.portForward(uuid, port, port);
+      const portForwardConnection = nodeSSHService.portForward(uuid, port, port);
       // startChokidarProcess();
       executingCommand(uuid , args,  '')
       executeRemote(

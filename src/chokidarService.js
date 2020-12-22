@@ -31,7 +31,7 @@ const getThePath = (filePath)  => {
 const syncLocalChange = async (filePath) => {
     console.log('Syncing the change')
     const {uuid} = await globalConfig
-    const remoteFolder = pathToRemoteFolder(uuid, getWorkingDirectory())
+    const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
     getThePath(filePath);
     var rsyncString = generateRsyncCommandString('./' + filePath, remoteFolder)
     console.log(rsyncString)
