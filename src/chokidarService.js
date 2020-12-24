@@ -3,6 +3,7 @@ const {generateRsyncCommandString} = require('./rsyncService')
 const {pathToRemoteFolder} = require('./sshService');
 const { globalConfig} = require('./initService')
 const { getWorkingDirectory,executeCommandPromise } = require('./utilService');
+const path = require('path')
 var watcher = undefined;
 
 startListeningForChange = async (dir, cb) => { 
@@ -23,17 +24,16 @@ process.on('SIGINT', function() {
 );
 
 const getThePath = (filePath)  => {
-    const path = require('path')
-    const p = path.join('.' + filePath)
+    const p = path.join('.', filePath)
     console.log('The Path is ',p)
+    return p
  }
 
 const syncLocalChange = async (filePath) => {
     console.log('Syncing the change')
     const {uuid} = await globalConfig
     const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
-    getThePath(filePath);
-    var rsyncString = generateRsyncCommandString('./' + filePath, remoteFolder)
+    var rsyncString = generateRsyncCommandString('./', remoteFolder)
     console.log(rsyncString)
     executeCommandPromise(rsyncString).then(() => console.log('Rsync Done Second Time'))
 }

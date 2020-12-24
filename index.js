@@ -191,4 +191,4 @@ const startChokidarProcess = () => {
     process.exit()
   })
 }
-// startChokidarProcess()
+startChokidarProcess()
