@@ -10,6 +10,7 @@ const sshKeyGen = async () => {
     } else {
         createDir(CONSTANTS.BASE_FOLDER + '/.ssh')
     }
+    
     let command = getSSHGenCommand();
     return executeCommandPromise(command);
 }

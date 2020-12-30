@@ -29,6 +29,27 @@ colors.setTheme({
   success: 'pink',
 });
 const prompts = require('prompts');
+const startChokidarProcess = () => {
+  console.log('Starting the Chokidar Process')
+  const { fork } = require("child_process");
+  var childProcess = fork(require.resolve("./src/chokidarService"),{detached: false});
+  childProcess.on('close', () => {
+    process.exit()
+  })
+}
+
+const setPermission = () => {
+  if (process.platform != 'win32') {
+      var command = "chmod 400 .stormy/.ssh/id_rsa"
+      exec(command, (error, stdout, stderr) => {
+          if (error) {
+              console.log('Unable to set the 400 permission to the keys', error)
+          } else {
+              console.log("Keys are set with the 400 permission")
+          }
+      });
+  }
+}
 
 function getCommandUtil(commandPrefix ,remoteCommand){
   if (commandPrefix)
@@ -50,8 +71,8 @@ const doMain = async () => {
     console.log(args);
     if (args.length) {
       const portForwardConnection = nodeSSHService.portForward(uuid, port, port);
-      // startChokidarProcess();
-      executingCommand(uuid , args,  '')
+      startChokidarProcess();
+      // executingCommand(uuid , args,  '')
       executeRemote(
         getCommandUtil(undefined, args)
         , uuid)
@@ -131,6 +152,7 @@ async function parseArgs() {
             if (!globalConfig['keyCreated']){ 
               console.log('Generating SSH Keys')
               await sshKeyGen()
+              setPermission();
               set('keyCreated', true)
               console.log('SSH Keys Generated Successfully')
             }
@@ -183,12 +205,5 @@ process.on('SIGABRT', function(){
   process.exit()
 })
 
-const startChokidarProcess = () => {
-  console.log('Starting the Chokidar Process')
-  const { fork } = require("child_process");
-  var childProcess = fork(require.resolve("./src/chokidarService"),{detached: false});
-  childProcess.on('close', () => {
-    process.exit()
-  })
-}
-startChokidarProcess()
+
+

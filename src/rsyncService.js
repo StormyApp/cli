@@ -19,7 +19,7 @@ function getExecutablePath(name){
 }
 
 function getSSHCommandString(){
-  return '-e \"' + getExecutablePath('ssh') + ' -v -i ' + getUserKey() + '\"'
+  return '-e \"' + getExecutablePath('ssh') + ' -i ' + getUserKey() + '\"'
 }
 
 function getExcludedFolderString(excludedFolders){
