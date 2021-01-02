@@ -32,7 +32,7 @@ function getExcludedFolderString(excludedFolders){
     cmd_line = cmd_line + " --exclude " +  folder + CONSTANTS.RSYNC.SPACE
   }
   // cmd_line = cmd_line + "''}"
-  return cmd_line
+  return cmd_line + "  --filter=':- .gitignore'"
 }
 
 function generateRsyncCommandString(sourceDir, destDir) {
