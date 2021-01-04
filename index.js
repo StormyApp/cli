@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 var exec = require('child_process').exec;
-const {isRemoteSetupDone, isInitDone, setUserCreated, setDefaultPort, globalConfig, getUUID, set } = require('./src/initService');
+const {isRemoteSetupDone, setUserCreated, setDefaultPort, globalConfig, getUUID, set } = require('./src/initService');
 
 require('dotenv').config({path: __dirname +'/' + 'local.env'});
 const CONSTANTS = require('./src/const');
-const { registerCLI,executingCommand } = require("./src/httpClient");
+const { registerCLI } = require("./src/httpClient");
 const utilService = require('./src/utilService');
 const sshService = require('./src/sshService')
 const colors = require('colors');
@@ -41,7 +41,7 @@ const startChokidarProcess = () => {
 const setPermission = () => {
   if (process.platform != 'win32') {
       var command = "chmod 400 .stormy/.ssh/id_rsa"
-      exec(command, (error, stdout, stderr) => {
+      exec(command, (error) => {
           if (error) {
               console.log('Unable to set the 400 permission to the keys', error)
           } else {
@@ -70,7 +70,6 @@ const doMain = async () => {
     // var dos2UnixCommand = dos2unix(args[0]);
     console.log(args);
     if (args.length) {
-      const portForwardConnection = nodeSSHService.portForward(uuid, port, port);
       startChokidarProcess();
       // executingCommand(uuid , args,  '')
       executeRemote(
@@ -146,33 +145,41 @@ async function parseArgs() {
         } 
 
         var uuid =  await getUUID()
-        if ( globalConfig['serverSetup'] === "stormy"){
-          try {
-            
-            if (!globalConfig['keyCreated']){ 
-              console.log('Generating SSH Keys')
-              await sshKeyGen()
-              setPermission();
-              set('keyCreated', true)
-              console.log('SSH Keys Generated Successfully')
-            }
-            const result = await registerCLI(uuid, sshService.readPublicKey());
-            setUserCreated(true)
-          } catch (e){
-            setUserCreated(false)
-            console.log(colors.info('Please contact us on'))
-            console.log(colors.info('https://twitter.com/AppStormy'))
-          }
+        if (!globalConfig['port']){
+          const {port} = await prompts({
+            type: 'number',
+            name: 'port',
+            message: 'What is the port to run your application?'
+          })
+          setDefaultPort(port || 3000)
         }
 
-        console.log(colors.info('....... INIT Done Successfully .........'))
-        const {port} = await prompts({
-          type: 'number',
-          name: 'port',
-          message: 'What is the port to run your application?'
-        })
-        setDefaultPort(port || 3000)
+        if (globalConfig['serverSetup'] === "stormy"){
+          // console.log(colors.info('We only support onPremise as of now. Please add your self to waitlist.'))
+          // console.log(colors.info('https://appstormy.typeform.com/to/wVoiY0ok'))
+          try {
+              if (!globalConfig['keyCreated']){ 
+                console.log('Generating SSH Keys')
+                await sshKeyGen()
+                setPermission();
+                set('keyCreated', true)
+                console.log('SSH Keys Generated Successfully')
+              }
+            } catch(err){
+              console.log(colors.error('Failed to generate Keys'));
+            }
 
+          try {
+            if(!globalConfig['userCreated']){
+              setUserCreated(true)
+              console.log(colors.info('....... INIT Done Successfully .........'))
+            }
+          } catch (e){
+            setUserCreated(false)
+            console.log(colors.error('Error Setting up the Env. Please contact us on'))
+            console.log(colors.error('https://twitter.com/AppStormy'))
+          }
+        }
         console.log(colors.info('If you want to change configurations in future go to your config file'))
         console.log(colors.info(CONSTANTS.CONFIG_FILE))
 
