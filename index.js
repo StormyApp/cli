@@ -171,6 +171,7 @@ async function parseArgs() {
 
           try {
             if(!globalConfig['userCreated']){
+              const result = await registerCLI(uuid, sshService.readPublicKey());
               setUserCreated(true)
               console.log(colors.info('....... INIT Done Successfully .........'))
             }
