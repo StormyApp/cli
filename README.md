@@ -3,12 +3,21 @@
 ![Build](https://github.com/railwayapp/cli/workflows/Build/badge.svg)
 
 This is the command line interface for [Stormy](https://stormyapp.com). Use it to speed up your compilation by 70%.
+Stormy uses cloud to speed up the compile time.
+
+# There are two modes to use stormy:-
+ 
+## OnPremise  
+This mode allows the user to connect stormy to there own server. Syncing the changes continously with the onPrem server and making speeding up the compile time.
+
+## stormyMode
+Stormy handles the compilation by using our highly powerful server. We are able to acheive a 70% reduction in the compile time.
 
 [View the docs](https://stormyapp.com/docs/cli)
 
-## Installation
+# Installation
 
-The Stormy CLI is available through [NPM](https://www.npmjs.com/package/stormy_build).
+The Stormy CLI is available through [NPM](https://www.npmjs.com/package/stormy_build). We used Node to write the CLI but it works well with the Rust and Java as well.
 
 ### NPM
 
@@ -16,7 +25,7 @@ The Stormy CLI is available through [NPM](https://www.npmjs.com/package/stormy_b
 npm i -g stormy_build
 ```
 
-## Documentation
+# Documentation
 
 Init the stormy in your project folder.
 
