@@ -35,7 +35,7 @@ You can access your project on the port that you provided while intalling the st
 http://localhost:3000
 ```
 
-All other commands will be run without stormy.
+All other commands will be run without **stormy** prefix.
 
-**You can reach out to use on Twitter Fore more querries**
+**You can reach out to use on [Twitter](https://twitter.com/AppStormy) Fore more querries**
 
