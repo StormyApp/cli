@@ -73,7 +73,7 @@ const doMain = async () => {
   const {uuid, port} = await globalConfig
   const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
   var str = generateRsyncCommandString('./', remoteFolder)
-  logger.info('Pushing doMain Changes', str)
+  logger.info('Pushing doMain Changes: ' + str)
   console.log('Syncing File Changes')
 
   var rsyncPromise = utilService.executeCommandPromise(str);

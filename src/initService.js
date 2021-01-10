@@ -1,3 +1,4 @@
+const { copySync } = require('fs-extra');
 const {readConfigJson} = require('./utilService')
 fs = require('fs')
 CONSTANTS = require('./const')
@@ -60,11 +61,36 @@ async function getUUID() {
     return uud;
 }
 
+const set = (key, value) => {
+    if (globalConfig){
+        globalConfig[key] = value
+        writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig, null, '\t')).then( (result) => {
+            // console.info('Global configuration Updated', globalConfig);
+        }).catch( (err) => {
+            console.error('Error updating Global configuration', err)
+        })
+    }
+}
+
+const getVersionControl = () => {
+    console.log('Ther version control')
+    let result = fs.existsSync('.gitignore');
+    if (result)
+        return "git"
+    result = fs.existsSync('.hgignore')
+    if (result)
+        return "mercury"
+    return "svn"
+}
+
 const init = () => {
     try {
         var initFile = CONSTANTS.CONFIG_FILE;
         createDir(CONSTANTS.BASE_FOLDER);
         globalConfig = readConfigJson(initFile);
+        if (!globalConfig['versionControl']){
+            set('versionControl', getVersionControl())
+        }
         return globalConfig;
     } catch(e){
       console.log("Error initiating the build", e)
@@ -95,16 +121,6 @@ const setDefaultPort = (port) => {
     set("port", port)
 }
 
-const set = (key, value) => {
-    if (globalConfig){
-        globalConfig[key] = value
-        writeConfigJson(CONSTANTS.CONFIG_FILE, JSON.stringify(globalConfig, null, '\t')).then( (result) => {
-            // console.info('Global configuration Updated', globalConfig);
-        }).catch( (err) => {
-            console.error('Error updating Global configuration', err)
-        })
-    }
-}
 
 const isInitDone = () => {
     // console.log("The globalConfig is", globalConfig)

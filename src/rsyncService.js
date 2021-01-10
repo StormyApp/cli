@@ -1,6 +1,7 @@
 var CONSTANTS = require('./const');
 const {getUserKey} = require('./sshService')
 const path = require('path');
+const {globalConfig} = require('./initService')
 
 function getExecutablePath(name){
   if(process.platform != 'win32'){
@@ -32,7 +33,11 @@ function getExcludedFolderString(excludedFolders){
     cmd_line = cmd_line + " --exclude " +  folder + CONSTANTS.RSYNC.SPACE
   }
   // cmd_line = cmd_line + "''}"
-  return cmd_line + "  --filter=':- .gitignore'"
+  if (globalConfig['versionControl'] === 'git')
+    return cmd_line + "  --filter=':- .gitignore'"
+  
+  if( globalConfig['versionControl'] === 'mercury')
+    return cmd_line + "  --filter=':- .hgignore'"
 }
 
 function generateRsyncCommandString(sourceDir, destDir) {

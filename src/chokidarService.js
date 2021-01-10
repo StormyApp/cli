@@ -58,8 +58,8 @@ const syncLocalChange = async (filePath) => {
     const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
     var rsyncString = generateRsyncCommandString('./', remoteFolder)
     // console.log(rsyncString)
-    logger.info('File Changed using command: ', filePath)
-    logger.info('Syncing the Changes using command: ', rsyncString)
+    logger.info('File Changed using command: '+ filePath)
+    logger.info('Syncing the Changes using command: '+ rsyncString)
     executeCommandPromise(rsyncString)
     .then(() => {
         logger.info('Synced the Changes to the server')
