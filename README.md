@@ -1,4 +1,4 @@
-# Introduction
+# [Stormy CLI](https://stormyapp.com)
 
 Stormy is a CLI Tool that enables developers to build faster by cutting down the development time.
 
