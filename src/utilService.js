@@ -1,6 +1,6 @@
 var exec = require('child_process').exec;
-const { spawn } = require('child_process');
 const colors = require('colors');
+const {logger} = require('./util/logger')
 
 function executeCommandPromise(command){
     // console.log('In the Promise Function of execute Command', command)
@@ -15,10 +15,12 @@ function executeCommandPromise(command){
       // child.on('exit', resolve)
       ,{maxBuffer: 1024 * 500} ,(error, stdout, stderr) => {
          if (error) {
-             console.log('There is an error executing the command', error)
+           logger.error('Error Executing the command ', error)
+            console.log('Errors', error)
             reject(error)  
           } else {
-              console.log("There is no errror", stdout)
+              console.log(stdout)
+              logger.info('Command Executed Successully')
               resolve(stdout? stdout : stderr);
           }
       });

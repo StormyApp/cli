@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var exec = require('child_process').exec;
 const {isRemoteSetupDone, setUserCreated, setDefaultPort, globalConfig, getUUID, set } = require('./src/initService');
+const {logger} = require('./src/util/logger')
 
 require('dotenv').config({path: __dirname +'/' + 'local.env'});
 const CONSTANTS = require('./src/const');
@@ -31,12 +32,21 @@ colors.setTheme({
 });
 const prompts = require('prompts');
 const startChokidarProcess = () => {
-  console.log('Starting the Chokidar Process')
   const { fork } = require("child_process");
   chokidarProcess = fork(require.resolve("./src/chokidarService"),{detached: false});
   chokidarProcess.on('close', () => {
     console.log('Exiting the Chokidar Process')
+    logger.info('Closing the chokidar Process')
     process.exit()
+  })
+  chokidarProcess.on('disconnect', () => {
+    logger.info('Disconnecting the chokidar Processs')
+  })
+  chokidarProcess.on('exit', () => {
+    logger.info('Exiting the chokidar Process')
+  })
+  chokidarProcess.on('error', (err) => {
+    logger.error('Chokidar Process Errored', err)
   })
 }
 
@@ -63,11 +73,13 @@ const doMain = async () => {
   const {uuid, port} = await globalConfig
   const remoteFolder = await pathToRemoteFolder(uuid, getWorkingDirectory())
   var str = generateRsyncCommandString('./', remoteFolder)
-  console.log("The Rsync string is",str)
+  logger.info('Pushing doMain Changes', str)
+  console.log('Syncing File Changes')
+
   var rsyncPromise = utilService.executeCommandPromise(str);
     rsyncPromise.then(() => {
-    console.log('Waiting for rsync to finish')
-    console.log('The globalConfig', globalConfig)
+    console.log('Changes Sync Successfully')
+    logger.info('The Global Config is', globalConfig)
     args = process.argv.slice(2)
     // var dos2UnixCommand = dos2unix(args[0]);
     console.log(args);

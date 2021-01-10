@@ -23,7 +23,8 @@
     "fs-extra": "^9.0.1",
     "node-ssh-forward": "^0.7.2",
     "prompts": "^2.4.0",
-    "ssh2": "^0.8.9"
+    "ssh2": "^0.8.9",
+    "winston": "^3.3.3"
   },
   "preferGlobal": true,
   "devDependencies": {}
