@@ -6,4 +6,5 @@ src/observer.js
 src/obs.js
 openBrowser.js
 .gitignore
+READMEd.md
 docs/
