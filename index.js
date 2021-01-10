@@ -14,6 +14,7 @@ const { exit } = require('process');
 const { generateRsyncCommandString } = require("./src/rsyncService");
 const { getWorkingDirectory } = require('./src/utilService');
 const { pathToRemoteFolder, sshKeyGen } = require('./src/sshService');
+var chokidarProcess = undefined;
 // console.log('After the require index') 
 colors.setTheme({
   silly: 'rainbow',
@@ -32,8 +33,9 @@ const prompts = require('prompts');
 const startChokidarProcess = () => {
   console.log('Starting the Chokidar Process')
   const { fork } = require("child_process");
-  var childProcess = fork(require.resolve("./src/chokidarService"),{detached: false});
-  childProcess.on('close', () => {
+  chokidarProcess = fork(require.resolve("./src/chokidarService"),{detached: false});
+  chokidarProcess.on('close', () => {
+    console.log('Exiting the Chokidar Process')
     process.exit()
   })
 }
@@ -203,12 +205,16 @@ process.on('SIGINT', function() {
 
 process.on('SIGHUP', function (){
   console.log('Exiting the terminal')
+  if (chokidarProcess)
+    chokidarProcess.kill('SIGTERM')
   sshClient.end()
   process.exit();
 })
 
 process.on('SIGABRT', function(){
   console.log('SIGABRT ...')
+  if (chokidarProcess)
+    chokidarProcess.kill('SIGTERM')
   sshClient.end()
   process.exit()
 })
