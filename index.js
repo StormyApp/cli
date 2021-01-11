@@ -9,12 +9,13 @@ const { registerCLI } = require("./src/httpClient");
 const utilService = require('./src/utilService');
 const sshService = require('./src/sshService')
 const colors = require('colors');
-const nodeSSHService = require('./src/nodeSSHService');
+const {portForward} = require('./src/nodeSSHService');
 const { executeRemote, sshClient } = require('./src/ssh2');
 const { exit } = require('process');
 const { generateRsyncCommandString } = require("./src/rsyncService");
 const { getWorkingDirectory } = require('./src/utilService');
 const { pathToRemoteFolder, sshKeyGen } = require('./src/sshService');
+const path = require('path');
 var chokidarProcess = undefined;
 // console.log('After the require index') 
 colors.setTheme({
@@ -63,6 +64,33 @@ const setPermission = () => {
   }
 }
 
+const getArtifactBack = async () => {
+  args = process.argv.slice(3)
+  logger.info('Fetching the following directory ' + args )
+  if (!args.length){
+    console.error('Please Enter the Path to bring back')
+    return
+  }
+
+  const targetPath = args[0]
+  const {uuid} = await globalConfig
+  var targetFolderPath = getWorkingDirectory() + '/' + trimTheEndSlash(targetPath)
+  const remoteFolderPath =await pathToRemoteFolder(uuid, targetFolderPath)
+  // console.log('The remot ', remoteFolderPath)
+  var str = generateRsyncCommandString(remoteFolderPath, '.')
+  console.log(str)
+  utilService.executeCommandPromise(str)
+
+}
+
+const trimTheEndSlash = (path) => {
+  if (path.endsWith('/')){
+    return path.slice(0, path.length-1)
+  }
+  return path
+  console.log('Does the string contains the end path')
+}
+
 function getCommandUtil(commandPrefix ,remoteCommand){
   if (commandPrefix)
     return "cd ~/" + getWorkingDirectory() + " ; "+ commandPrefix + ';' + remoteCommand.join(' ')
@@ -86,6 +114,7 @@ const doMain = async () => {
     if (args.length) {
       startChokidarProcess();
       // executingCommand(uuid , args,  '')
+      portForward(port, port);
       executeRemote(
         getCommandUtil(undefined, args)
         , uuid)
@@ -198,6 +227,9 @@ async function parseArgs() {
         console.log(colors.info('If you want to change configurations in future go to your config file'))
         console.log(colors.info(CONSTANTS.CONFIG_FILE))
 
+      break;
+    case 'fetch':
+      getArtifactBack()
       break;
     default:
       if ( !isRemoteSetupDone() )
