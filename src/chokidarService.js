@@ -5,10 +5,20 @@ const { globalConfig} = require('./initService')
 const { getWorkingDirectory,executeCommandPromise } = require('./utilService');
 const path = require('path');
 const { logger } = require('./util/logger');
+const { debounce } = require('throttle-debounce');
 var watcher = undefined;
 
+const debounceSync = debounce(1000, false, async (path) => {
+    syncLocalChange(path)
+});
+
 startListeningForChange = async (dir, cb) => { 
-    watcher = chokidar.watch(dir, { persistent: true, ignoreInitial:true, ignored:['.git','node_modules'] });
+    watcher = chokidar.watch(dir, { persistent: true, ignoreInitial:true, ignored:['.git','node_modules'],
+    ignorePermissionErrors: true,
+    awaitWriteFinish: {
+        stabilityThreshold: 2000,
+        pollInterval: 400
+      } });
     watcher.on('change', async filePath => cb(filePath))
     watcher.on('add', async filePath => cb(filePath))
     logger.info('Chokidar Process Listening For the Change')
@@ -68,7 +78,9 @@ const syncLocalChange = async (filePath) => {
         logger.error('Unable to sync the changes to Remote Server', er)
     })
 }
-startListeningForChange('.', syncLocalChange)
+startListeningForChange('.', (filePath) => {
+    debounceSync(filePath);
+})
 
 module.exports = {
     startListeningForChange,
