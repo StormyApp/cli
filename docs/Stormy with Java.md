@@ -29,6 +29,12 @@ You can access your project on the port that you provided while intalling the st
 http://localhost:3000
 ```
 
+## Fetching the Artifact
+You can fetch the artifact back by executing the command.
+```
+stormy fetch relative_path_to_artifact_folder
+```
+
 All other commands will be run without **stormy** prefix.
 
 **You can reach out to use on [Twitter](https://twitter.com/AppStormy) Fore more querries**
