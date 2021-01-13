@@ -1,6 +1,6 @@
 # Using Stormy With Java Project
 
-First Follow the guide to [Install Stormy](./installation.md)
+First Follow the guide to [Install Stormy](./Installation.md)
 
 ## Installing Dependencies
 
