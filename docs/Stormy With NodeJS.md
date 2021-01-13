@@ -1,6 +1,6 @@
 # Using Stormy With Node Project
 
-First Follow the guide to [Install Stormy](./installation.md)
+First Follow the guide to [Install Stormy](./Installation.md)
 
 ## Installing Dependencies
 Inside your node Project Folder. Install all the dependencies using **npm** or **yarn**.
