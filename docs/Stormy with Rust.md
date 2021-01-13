@@ -1,6 +1,6 @@
 # Using Stormy With Rust Project
 
-First Follow the guide to [Install Stormy](./installation.md)
+First Follow the guide to [Install Stormy](./Installation.md)
 
 ## Setting up Rust Version
 Please fill the [form](https://appstormy.typeform.com/to/wVoiY0ok) to provide your rust version that your project uses.
